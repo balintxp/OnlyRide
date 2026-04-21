@@ -1,0 +1,49 @@
+﻿@inherits DotNetNuke.Web.Mvc.Framework.DnnWebViewPage<IEnumerable<OnlyRide.Dnn.ServiceBooking.Models.Booking>>
+
+@using DotNetNuke.Web.Mvc.Helpers
+
+<div id="BookingsList-@Dnn.ModuleContext.ModuleId">
+
+    <h2>Szervizfoglalások</h2>
+
+    @if (Model == null || !Model.Any())
+    {
+        <p>Jelenleg nincsenek aktív foglalások.</p>
+    }
+    else
+    {
+        <table class="table table-striped" style="width: 100%; text-align: left;">
+            <thead>
+                <tr>
+                    <th>Dátum</th>
+                    <th>Státusz</th>
+                    <th>Megjegyzés</th>
+                    <th>Műveletek</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var booking in Model)
+                {
+                    <tr>
+                        <td>@booking.CreatedOnDate.ToString("yyyy.MM.dd HH:mm")</td>
+                        <td><strong>@booking.Status</strong></td>
+                        <td>@booking.CustomNote</td>
+                        <td>
+                            <a href="@Url.Action("Edit", "Booking", new { bookingId = booking.BookingId })" class="dnnSecondaryAction">Szerkesztés</a>
+
+                            @if (Dnn.ModuleContext.IsEditable)
+                            {
+                                <a href="@Url.Action("Delete", "Booking", new { bookingId = booking.BookingId })" class="dnnSecondaryAction" style="color: red;" onclick="return confirm('Biztosan törlöd ezt a foglalást?');">Törlés</a>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+
+    <div style="margin-top: 20px;">
+        <a href="@Url.Action("Edit", "Booking", new { bookingId = -1 })" class="dnnPrimaryAction">Új Szerviz Időpont Foglalása</a>
+    </div>
+
+</div>

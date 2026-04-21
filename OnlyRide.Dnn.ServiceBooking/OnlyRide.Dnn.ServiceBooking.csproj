@@ -104,11 +104,14 @@
       <DependentUpon>Settings.resx</DependentUpon>
     </Compile>
     <Compile Include="Components\FeatureController.cs" />
-    <Compile Include="Components\ItemManager.cs" />
+    <Compile Include="Components\ServiceBookingManager.cs" />
     <Compile Include="Controllers\SettingsController.cs" />
-    <Compile Include="Models\Item.cs" />
-    <Compile Include="Controllers\ItemController.cs" />
+    <Compile Include="Models\Booking.cs" />
+    <Compile Include="Controllers\BookingController.cs" />
+    <Compile Include="Models\ServiceType.cs" />
     <Compile Include="Models\Settings.cs" />
+    <Compile Include="Models\TimeSlot.cs" />
+    <Compile Include="Models\Vehicle.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -149,8 +152,8 @@
     <Content Include="Web.config">
       <SubType>Designer</SubType>
     </Content>
-    <Content Include="Views\Item\Index.cshtml" />
-    <Content Include="Views\Item\Edit.cshtml" />
+    <Content Include="Views\Booking\Index.cshtml" />
+    <Content Include="Views\Booking\Edit.cshtml" />
     <Content Include="Views\Settings\Settings.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
