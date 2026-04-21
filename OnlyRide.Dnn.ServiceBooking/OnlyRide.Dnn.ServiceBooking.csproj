@@ -201,4 +201,8 @@
   <Import Project="BuildScripts\ModulePackage.Targets" />
   <Target Name="AfterBuild" DependsOnTargets="PackageModule">
   </Target>
+  <PropertyGroup>
+    <PostBuildEvent>xcopy "$(TargetPath)" "C:\DotNetNuke\Dev\DesktopModules\bin\" /y
+xcopy "$(ProjectDir)Views\*.cshtml" "C:\DotNetNuke\Dev\DesktopModules\MVC\OnlyRide.Dnn.ServiceBooking\Views\" /s /y</PostBuildEvent>
+  </PropertyGroup>
 </Project>

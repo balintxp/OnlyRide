@@ -18,7 +18,7 @@ namespace OnlyRide.Dnn.ServiceBooking.Models
         public decimal EstimatedPrice { get; set; }
         public int? ActualMinutes { get; set; }
         public decimal? ActualPrice { get; set; }
-        public string Status { get; set; } = "Pending";
+        public string Status { get; set; } = "Függőben";
         public bool InvoiceSent { get; set; } = false;
         public DateTime CreatedOnDate { get; set; } = DateTime.UtcNow;
         public int ModuleId { get; set; }
