@@ -1,49 +1,66 @@
 ﻿@inherits DotNetNuke.Web.Mvc.Framework.DnnWebViewPage<IEnumerable<OnlyRide.Dnn.ServiceBooking.Models.Booking>>
-
 @using DotNetNuke.Web.Mvc.Helpers
 
-<div id="BookingsList-@Dnn.ModuleContext.ModuleId">
+<link rel="stylesheet" href="/DesktopModules/MVC/OnlyRide.Dnn.ServiceBooking/module.css">
 
-    <h2>Szervizfoglalások</h2>
+@{
+    var hu = new System.Globalization.CultureInfo("hu-HU");
+    var today = DateTime.Today;
+    int diff = (7 + (today.DayOfWeek - DayOfWeek.Monday)) % 7;
+    var monday = today.AddDays(-1 * diff).Date;
 
-    @if (Model == null || !Model.Any())
-    {
-        <p>Jelenleg nincsenek aktív foglalások.</p>
-    }
-    else
-    {
-        <table class="table table-striped" style="width: 100%; text-align: left;">
-            <thead>
-                <tr>
-                    <th>Dátum</th>
-                    <th>Státusz</th>
-                    <th>Megjegyzés</th>
-                    <th>Műveletek</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var booking in Model)
-                {
-                    <tr>
-                        <td>@booking.CreatedOnDate.ToString("yyyy.MM.dd HH:mm")</td>
-                        <td><strong>@booking.Status</strong></td>
-                        <td>@booking.CustomNote</td>
-                        <td>
-                            <a href="@Url.Action("Edit", "Booking", new { bookingId = booking.BookingId })" class="dnnSecondaryAction">Szerkesztés</a>
+    var weekNum = hu.Calendar.GetWeekOfYear(monday, System.Globalization.CalendarWeekRule.FirstFourDayWeek, DayOfWeek.Monday);
+}
 
-                            @if (Dnn.ModuleContext.IsEditable)
-                            {
-                                <a href="@Url.Action("Delete", "Booking", new { bookingId = booking.BookingId })" class="dnnSecondaryAction" style="color: red;" onclick="return confirm('Biztosan törlöd ezt a foglalást?');">Törlés</a>
-                            }
-                        </td>
-                    </tr>
-                }
-            </tbody>
-        </table>
-    }
+<div class="onlyride-calendar">
+    <div class="calendar-controls">
+        <button class="dnnSecondaryAction">&lt;</button>
+        <span class="week-selector">@monday.Year. @weekNum. hét (@monday.ToString("MMM. dd.", hu) - @monday.AddDays(6).ToString("MMM. dd.", hu))</span>
+        <button class="dnnSecondaryAction">&gt;</button>
 
-    <div style="margin-top: 20px;">
-        <a href="@Url.Action("Edit", "Booking", new { bookingId = -1 })" class="dnnPrimaryAction">Új Szerviz Időpont Foglalása</a>
+        <div class="calendar-legend">
+            <span class="legend-item"><span class="dot szabad"></span> Szabad</span>
+            <span class="legend-item"><span class="dot foglalt"></span> Foglalt</span>
+            <span class="legend-item"><span class="dot sajat"></span> Saját</span>
+        </div>
     </div>
 
+    <div class="calendar-grid">
+        <div class="grid-header"></div>
+        @for (int i = 0; i < 7; i++)
+        {
+            var dayDate = monday.AddDays(i);
+            <div class="grid-header">
+                @hu.TextInfo.ToTitleCase(dayDate.ToString("dddd", hu))<br />
+                <small>@dayDate.ToString("MMM. dd.", hu)</small>
+            </div>
+        }
+
+        @for (int hour = 8; hour <= 15; hour++)
+        {
+            <div class="time-label">@hour:00</div>
+            for (int day = 0; day < 7; day++)
+            {
+                var currentSlotDate = monday.AddDays(day).AddHours(hour);
+                // CreatedOnDate használata, ahogy korábban javítottuk
+                var booking = Model.FirstOrDefault(b => b.CreatedOnDate.Date == currentSlotDate.Date && b.CreatedOnDate.Hour == hour);
+
+                string statusClass = "status-szabad";
+                string statusText = "Szabad";
+                string actionUrl = Url.Action("Edit", "Booking", new { date = currentSlotDate.ToString("yyyy-MM-dd HH:mm") });
+
+                if (booking != null)
+                {
+                    bool isMine = booking.UserId == Dnn.User.UserID;
+                    statusClass = isMine ? "status-sajat" : "status-foglalt";
+                    statusText = isMine ? "Saját" : "Foglalt";
+                    actionUrl = (isMine || Dnn.ModuleContext.IsEditable) ? Url.Action("Edit", "Booking", new { itemId = booking.BookingId }) : "#";
+                }
+
+                <div class="slot-card @statusClass" onclick="if('@actionUrl' !== '#') location.href='@actionUrl'">
+                    @statusText
+                </div>
+            }
+        }
+    </div>
 </div>

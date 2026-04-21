@@ -50,7 +50,7 @@ BEGIN
         [EstimatedPrice] DECIMAL(10,2) NOT NULL,
         [ActualMinutes] INT NULL,
         [ActualPrice] DECIMAL(10,2) NULL,
-        [Status] NVARCHAR(50) NOT NULL DEFAULT 'Pending',
+        [Status] NVARCHAR(50) NOT NULL DEFAULT 'Függőben',
         [InvoiceSent] BIT NOT NULL DEFAULT 0,
         [CreatedOnDate] DATETIME NOT NULL DEFAULT GETDATE(),
         [ModuleId] INT NOT NULL
