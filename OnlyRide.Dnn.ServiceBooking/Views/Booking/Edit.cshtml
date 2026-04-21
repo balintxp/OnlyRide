@@ -1,57 +1,42 @@
 ﻿@inherits DotNetNuke.Web.Mvc.Framework.DnnWebViewPage<OnlyRide.Dnn.ServiceBooking.Models.Booking>
 
-@using System.Collections.Generic
-@using DotNetNuke.Web.Mvc.Helpers
+<link rel="stylesheet" href="/DesktopModules/MVC/OnlyRide.Dnn.ServiceBooking/module.css">
 
-<div id="Booking-@Dnn.ModuleContext.ModuleId" class="dnnForm">
-    @Html.AntiForgeryToken()
-    @Html.HiddenFor(m => m.BookingId)
-    @Html.HiddenFor(m => m.ModuleId)
+<div class="onlyride-edit-card">
+    <h2>Időpont foglalása</h2>
 
-    <h2 class="dnnFormSectionHead">
-        <a href="#">Foglalás Részletei</a>
-    </h2>
-    <fieldset>
-        <div class="dnnFormItem">
-            <div><label for="ServiceTypeId">Szerviz típusa (ID egyelőre)</label></div>
-            @Html.TextBoxFor(m => m.ServiceTypeId)
+    <form action="@Url.Action("Edit", "Booking")" method="post">
+        @Html.AntiForgeryToken()
+
+        @* Fontos: a nevek egyezzenek a SQL oszlopokkal! *@
+        <input type="hidden" name="BookingId" value="@Model.BookingId" />
+        <input type="hidden" name="ModuleId" value="@Model.ModuleId" />
+        <input type="hidden" name="SlotId" value="@Model.SlotId" />
+        <input type="hidden" name="UserId" value="@Model.UserId" />
+
+        <div class="onlyride-form-group">
+            <label>Választott időpont</label>
+            <input type="text" value="@Model.CreatedOnDate.ToString("yyyy. MM. dd. HH:mm")" readonly style="background:#f5f5f5;" />
+            <input type="hidden" name="CreatedOnDate" value="@Model.CreatedOnDate.ToString("yyyy-MM-dd HH:mm")" />
         </div>
 
-        <div class="dnnFormItem">
-            <div><label for="SlotId">Időpont (ID egyelőre)</label></div>
-            @Html.TextBoxFor(m => m.SlotId)
+        <div class="onlyride-form-group">
+            <label>Szolgáltatás típusa</label>
+            <select name="ServiceTypeId">
+                <option value="1">Általános szerviz</option>
+                <option value="2">Gumicsere</option>
+                <option value="3">Szoftveres javítás</option>
+            </select>
         </div>
 
-        <div class="dnnFormItem">
-            <div><label for="CustomNote">Megjegyzés / Hiba leírása</label></div>
-            @Html.TextAreaFor(m => m.CustomNote, new { rows = "4" })
+        <div class="onlyride-form-group">
+            <label>Hiba leírása</label>
+            <textarea name="CustomNote" rows="4" placeholder="Írd le a problémát...">@Model.CustomNote</textarea>
         </div>
-    </fieldset>
 
-    @* Ezt a részt csak az adminok/szerelők látják, ha szerkesztő módban vannak az oldalon *@
-    @if (Dnn.ModuleContext.IsEditable)
-    {
-        <h2 class="dnnFormSectionHead">
-            <a href="#">Szerelői adatok (Karbantartás)</a>
-        </h2>
-        <fieldset>
-            <div class="dnnFormItem">
-                <div><label for="Status">Státusz</label></div>
-                @Html.DropDownListFor(m => m.Status, new SelectList(new[] { "Függőben", "Jóváhagyva", "Befejezve" }))
-            </div>
-            <div class="dnnFormItem">
-                <div><label for="ActualMinutes">Tényleges munkaidő (perc)</label></div>
-                @Html.TextBoxFor(m => m.ActualMinutes)
-            </div>
-            <div class="dnnFormItem">
-                <div><label for="ActualPrice">Tényleges ár (Ft)</label></div>
-                @Html.TextBoxFor(m => m.ActualPrice)
-            </div>
-        </fieldset>
-    }
-
-    <div style="margin-top: 20px;">
-        <button type="submit" class="dnnPrimaryAction">Mentés</button>
-        <a href="@Url.Action("Index", "Booking")" class="dnnSecondaryAction">Mégse</a>
-    </div>
+        <div class="onlyride-actions">
+            <button type="submit" class="btn-confirm">Foglalás megerősítése</button>
+            <a href="@Url.Action("Index", "Booking")" class="btn-cancel">Mégse</a>
+        </div>
+    </form>
 </div>

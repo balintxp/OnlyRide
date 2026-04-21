@@ -1,7 +1,6 @@
 /* A naptár fõ rácsa */
 .onlyride-calendar .calendar-grid {
     display: grid !important;
-    /* 80px az idõnek, utána 7 egyenlõ oszlop a napoknak */
     grid-template-columns: 80px repeat(7, 1fr) !important;
     gap: 8px !important;
     background-color: #fff;
@@ -16,13 +15,13 @@
     text-align: center;
     padding: 10px;
     background: #f9f9f9;
-    border-bottom: 2px solid #ddd; /* Itt a sötétebb szürkét hagytam meg */
+    border-bottom: 2px solid #ddd;
     font-weight: bold;
 }
 
 /* Egy idõsáv kártyája (Slot) */
 .onlyride-calendar .slot-card {
-    display: flex; /* Flexboxszal sokkal könnyebb a szöveget középre tenni */
+    display: flex;
     align-items: center;
     justify-content: center;
     min-height: 45px;
@@ -35,9 +34,17 @@
     border: 2px solid transparent !important;
     text-decoration: none !important;
     line-height: 1.2;
+    transition: transform 0.2s, filter 0.2s;
 }
 
-/* Színkódok a Figma alapján - !important kell a DNN ellen */
+/* Hover a naptár kártyákon - NINCS KÉK */
+.onlyride-calendar .slot-card:hover {
+    transform: translateY(-2px);
+    filter: brightness(0.95);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1) !important;
+}
+
+/* Színkódok a Figma alapján */
 .onlyride-calendar .status-szabad {
     background-color: #e6f9ed !important;
     color: #2ecc71 !important;
@@ -84,15 +91,105 @@
     margin-right: 8px;
 }
 
-    /* Pöttyök színei a Figma alapján */
-    .dot.szabad {
-        background-color: #2ecc71;
-    }
+.dot.szabad {
+    background-color: #2ecc71;
+}
 
-    .dot.foglalt {
-        background-color: #e74c3c;
-    }
+.dot.foglalt {
+    background-color: #e74c3c;
+}
 
-    .dot.sajat {
-        background-color: #4361ee;
-    }
+.dot.sajat {
+    background-color: #4361ee;
+}
+
+/* Edit kártya konténer */
+.onlyride-edit-card {
+    max-width: 500px;
+    margin: 40px auto;
+    background: #ffffff;
+    padding: 30px;
+    border-radius: 20px;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+    border: 1px solid #f0f0f0;
+}
+
+.onlyride-edit-card h2 {
+    font-size: 24px;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin-bottom: 25px;
+    text-align: center;
+    border: none;
+}
+
+/* Mezõk stílusa */
+.onlyride-form-group {
+    margin-bottom: 20px;
+}
+
+.onlyride-form-group label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: #4a4a4a;
+}
+
+.onlyride-form-group input,
+.onlyride-form-group select,
+.onlyride-form-group textarea {
+    width: 100% !important;
+    padding: 12px 15px !important;
+    border: 2px solid #edf2f7 !important;
+    border-radius: 10px !important;
+    font-size: 15px !important;
+    transition: border-color 0.2s;
+    box-sizing: border-box;
+}
+
+.onlyride-form-group input:focus {
+    border-color: #2ecc71 !important;
+    outline: none;
+}
+
+/* Gombok stílusa */
+.onlyride-actions {
+    display: flex;
+    gap: 15px;
+    margin-top: 30px;
+}
+
+.btn-confirm {
+    flex: 2;
+    background-color: #2ecc71 !important; /* Figma zöld */
+    color: white !important;
+    padding: 12px;
+    border-radius: 10px !important;
+    font-weight: bold;
+    text-align: center;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+/* Hover állapot: Sötétebb zöld, NEM kék */
+.btn-confirm:hover {
+    background-color: #27ae60 !important;
+    color: white !important;
+    box-shadow: none !important;
+}
+
+.btn-cancel {
+    flex: 1;
+    background-color: #f1f3f5 !important;
+    color: #495057 !important;
+    padding: 12px;
+    border-radius: 10px !important;
+    text-align: center;
+    text-decoration: none !important;
+}
+
+.btn-cancel:hover {
+    background-color: #e9ecef !important;
+    color: #495057 !important;
+}
