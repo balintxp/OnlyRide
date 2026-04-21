@@ -112,7 +112,7 @@ namespace OnlyRide.Dnn.ServiceBooking.Components
             using (IDataContext ctx = DataContext.Instance())
             {
                 var rep = ctx.GetRepository<ServiceType>();
-                return rep.Get(moduleId);
+                return rep.Find("WHERE IsActive = @0", true);
             }
         }
 

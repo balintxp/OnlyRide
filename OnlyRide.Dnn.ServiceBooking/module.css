@@ -193,3 +193,9 @@
     background-color: #e9ecef !important;
     color: #495057 !important;
 }
+
+.onlyride-form-group select {
+    height: 48px !important;
+    padding: 10px 15px !important;
+    line-height: 1.5 !important;
+}

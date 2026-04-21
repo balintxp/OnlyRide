@@ -1,42 +1,54 @@
 ﻿@inherits DotNetNuke.Web.Mvc.Framework.DnnWebViewPage<OnlyRide.Dnn.ServiceBooking.Models.Booking>
-
-<link rel="stylesheet" href="/DesktopModules/MVC/OnlyRide.Dnn.ServiceBooking/module.css">
+@using DotNetNuke.Web.Mvc.Helpers
 
 <div class="onlyride-edit-card">
     <h2>Időpont foglalása</h2>
 
-    <form action="@Url.Action("Edit", "Booking")" method="post">
-        @Html.AntiForgeryToken()
+    @* Manuális form, de az URL-be kényszerítjük a mid-et és tabid-et *@
+<form action="@Url.Action("Edit", "Booking")?mid=@Dnn.ModuleContext.ModuleId&tabid=@Dnn.PortalSettings.ActiveTab.TabID" method="post">
+    @Html.AntiForgeryToken()
 
-        @* Fontos: a nevek egyezzenek a SQL oszlopokkal! *@
-        <input type="hidden" name="BookingId" value="@Model.BookingId" />
-        <input type="hidden" name="ModuleId" value="@Model.ModuleId" />
-        <input type="hidden" name="SlotId" value="@Model.SlotId" />
-        <input type="hidden" name="UserId" value="@Model.UserId" />
+    @* LÉTFONTOSSÁGÚ: A DNN ezen mezők alapján talál vissza az Indexre *@
+    <input type="hidden" name="mid" value="@Dnn.ModuleContext.ModuleId" />
+    <input type="hidden" name="BookingId" value="@Model.BookingId" />
+    <input type="hidden" name="ModuleId" value="@Dnn.ModuleContext.ModuleId" />
+    <input type="hidden" name="SlotId" value="@Model.SlotId" />
+    <input type="hidden" name="UserId" value="@Dnn.User.UserID" />
 
-        <div class="onlyride-form-group">
-            <label>Választott időpont</label>
-            <input type="text" value="@Model.CreatedOnDate.ToString("yyyy. MM. dd. HH:mm")" readonly style="background:#f5f5f5;" />
-            <input type="hidden" name="CreatedOnDate" value="@Model.CreatedOnDate.ToString("yyyy-MM-dd HH:mm")" />
-        </div>
+    <div class="onlyride-form-group">
+        <label>Választott időpont</label>
+        <input type="text" value="@Model.CreatedOnDate.ToString("yyyy. MM. dd. HH:mm")" readonly style="background:#f5f5f5;" />
+        <input type="hidden" name="CreatedOnDate" value="@Model.CreatedOnDate.ToString("yyyy-MM-dd HH:mm")" />
+    </div>
 
-        <div class="onlyride-form-group">
-            <label>Szolgáltatás típusa</label>
-            <select name="ServiceTypeId">
-                <option value="1">Általános szerviz</option>
-                <option value="2">Gumicsere</option>
-                <option value="3">Szoftveres javítás</option>
-            </select>
-        </div>
+    <div class="onlyride-form-group">
+        <label>Szolgáltatás típusa</label>
+        <select name="ServiceTypeId" class="form-control">
+            @foreach (var st in (IEnumerable<OnlyRide.Dnn.ServiceBooking.Models.ServiceType>)ViewBag.ServiceTypes)
+            {
+                <option value="@st.ServiceTypeId" @(Model.ServiceTypeId == st.ServiceTypeId ? "selected" : "")>
+                    @st.Name
+                </option>
+            }
+        </select>
+    </div>
 
-        <div class="onlyride-form-group">
-            <label>Hiba leírása</label>
-            <textarea name="CustomNote" rows="4" placeholder="Írd le a problémát...">@Model.CustomNote</textarea>
-        </div>
+    <div class="onlyride-form-group">
+        <label>Hiba leírása</label>
+        <textarea name="CustomNote" rows="4" placeholder="Írd le a problémát...">@Model.CustomNote</textarea>
+    </div>
 
-        <div class="onlyride-actions">
-            <button type="submit" class="btn-confirm">Foglalás megerősítése</button>
-            <a href="@Url.Action("Index", "Booking")" class="btn-cancel">Mégse</a>
-        </div>
-    </form>
+    <div class="onlyride-actions">
+        <button type="submit" class="btn-confirm">Foglalás megerősítése</button>
+        @if (Model.BookingId > 0 && (Model.UserId == Dnn.User.UserID || Dnn.User.IsSuperUser || Dnn.ModuleContext.IsEditable))
+        {
+            <a href="@Url.Action("Cancel", "Booking", new { bookingId = Model.BookingId })"
+               class="btn-cancel"
+               onclick="return confirm('Biztosan lemondja a foglalást?');">
+                Lemondás
+            </a>
+        }
+        <a href="@Url.Action("Index", "Booking")" class="btn-cancel">Mégse</a>
+    </div>
+</form>
 </div>

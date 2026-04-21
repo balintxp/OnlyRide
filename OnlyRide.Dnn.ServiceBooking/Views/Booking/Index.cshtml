@@ -42,22 +42,27 @@
             for (int day = 0; day < 7; day++)
             {
                 var currentSlotDate = monday.AddDays(day).AddHours(hour);
-                // CreatedOnDate használata, ahogy korábban javítottuk
-                var booking = Model.FirstOrDefault(b => b.CreatedOnDate.Date == currentSlotDate.Date && b.CreatedOnDate.Hour == hour);
-
+                var booking = Model.FirstOrDefault(b => b.CreatedOnDate.Date == currentSlotDate.Date && b.CreatedOnDate.Hour == hour && b.Status != "Lemondva");
                 string statusClass = "status-szabad";
                 string statusText = "Szabad";
-                string actionUrl = Url.Action("Edit", "Booking", new { date = currentSlotDate.ToString("yyyy-MM-dd HH:mm") });
+                string actionUrl = "#";
 
                 if (booking != null)
                 {
                     bool isMine = booking.UserId == Dnn.User.UserID;
+                    bool isAdmin = Dnn.User.IsSuperUser || Dnn.ModuleContext.IsEditable;
                     statusClass = isMine ? "status-sajat" : "status-foglalt";
-                    statusText = isMine ? "Saját" : "Foglalt";
-                    actionUrl = (isMine || Dnn.ModuleContext.IsEditable) ? Url.Action("Edit", "Booking", new { itemId = booking.BookingId }) : "#";
+                    statusText = isMine ? "Saját" : (isAdmin ? "Foglalt (admin)" : "Foglalt");
+                    actionUrl = (isMine || isAdmin) ? string.Format("{0}?bookingId={1}&mid={2}", Url.Action("Edit", "Booking"), booking.BookingId, Dnn.ModuleContext.ModuleId) : "#";
                 }
-
-                <div class="slot-card @statusClass" onclick="if('@actionUrl' !== '#') location.href='@actionUrl'">
+                else if (Dnn.User.UserID > 0)
+                {
+                    statusClass = "status-szabad";
+                    statusText = "Szabad";
+                    actionUrl = Url.Action("Edit", "Booking", new { date = currentSlotDate.ToString("yyyy-MM-dd HH:mm") });
+                }
+                <div class="slot-card @statusClass"
+                     onclick="location.href='@actionUrl'">
                     @statusText
                 </div>
             }

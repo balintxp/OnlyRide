@@ -26,27 +26,31 @@ namespace OnlyRide.Dnn.ServiceBooking.Controllers
 
         public ActionResult Edit(int bookingId = -1, string date = "")
         {
-            DotNetNuke.Framework.JavaScriptLibraries.JavaScript.RequestRegistration(CommonJs.DnnPlugins);
+
+            ViewBag.ServiceTypes = ServiceBookingManager.Instance.GetServiceTypes(ModuleContext.ModuleId);
 
             var booking = (bookingId == -1 || bookingId == 0)
-                 ? new Booking
-                 {
-                     ModuleId = ModuleContext.ModuleId,
-                     CreatedOnDate = !string.IsNullOrEmpty(date) ? DateTime.Parse(date) : DateTime.Now,
-                     Status = "Függőben"
-                 }
-                 : ServiceBookingManager.Instance.GetBooking(bookingId, ModuleContext.ModuleId);
+                ? new Booking
+                {
+                    ModuleId = ModuleContext.ModuleId,
+                    CreatedOnDate = !string.IsNullOrEmpty(date) ? DateTime.Parse(date) : DateTime.Now,
+                    Status = "Függőben"
+                }
+                : ServiceBookingManager.Instance.GetBooking(bookingId, ModuleContext.ModuleId);
 
             return View(booking);
         }
 
         [HttpPost]
-        [DotNetNuke.Web.Mvc.Framework.ActionFilters.ValidateAntiForgeryToken]
+        //[DotNetNuke.Web.Mvc.Framework.ActionFilters.ValidateAntiForgeryToken]
         public ActionResult Edit(Booking booking)
         {
+            if (!ModelState.IsValid)
+            {
+                return View(booking); 
+            }
             try
             {
-                // Ha új foglalás, minden kötelező számot beállítunk 0-ra, ha üres lenne
                 if (booking.BookingId <= 0)
                 {
                     booking.UserId = User.UserID;
@@ -69,12 +73,10 @@ namespace OnlyRide.Dnn.ServiceBooking.Controllers
                     }
                 }
 
-                // Ha a mentés sikerült, irány vissza a naptárhoz!
-                return RedirectToDefaultRoute();
+                return Redirect(DotNetNuke.Common.Globals.NavigateURL());
             }
             catch (Exception ex)
             {
-                // Ha üres oldalt kapsz, nézd meg jól a bal felső sarkot, ide írja a hibát!
                 return Content("MENTÉSI HIBA TÖRTÉNT: " + ex.Message);
             }
         }
@@ -82,6 +84,17 @@ namespace OnlyRide.Dnn.ServiceBooking.Controllers
         {
             var bookings = ServiceBookingManager.Instance.GetBookings(ModuleContext.ModuleId);
             return View(bookings);
+        }
+
+        public ActionResult Cancel(int bookingId)
+        {
+            var booking = ServiceBookingManager.Instance.GetBooking(bookingId, ModuleContext.ModuleId);
+            if (booking != null && (booking.UserId == User.UserID || ModuleContext.IsEditable || User.IsSuperUser))
+            {
+                booking.Status = "Lemondva";
+                ServiceBookingManager.Instance.UpdateBooking(booking);
+            }
+            return Redirect(DotNetNuke.Common.Globals.NavigateURL());
         }
     }
 }

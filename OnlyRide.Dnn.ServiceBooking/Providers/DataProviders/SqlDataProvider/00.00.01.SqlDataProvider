@@ -74,3 +74,15 @@ BEGIN
     ) ON [PRIMARY]
 END
 GO
+/* Alapértelmezett szerviztípusok rögzítése */
+IF NOT EXISTS (SELECT * FROM {databaseOwner}[{objectQualifier}OnlyRide_ServiceTypes])
+BEGIN
+    INSERT INTO {databaseOwner}[{objectQualifier}OnlyRide_ServiceTypes] 
+    ([Name], [Description], [EstimatedMinutes], [BasePrice], [IsActive], [ModuleId])
+    VALUES 
+    (N'Általános szerviz', N'Általános átvizsgálás', 60, 5000, 1, 0),
+    (N'Gumicsere', N'Gumiabroncs cseréje', 30, 3000, 1, 0),
+    (N'Akkumulátor javítás', N'Akkumulátor diagnosztika és csere', 90, 12000, 1, 0),
+    (N'Egyéb', N'Egyéb szerviz igény, kérjük írja le a problémát', 60, 5000, 1, 0);
+END
+GO
