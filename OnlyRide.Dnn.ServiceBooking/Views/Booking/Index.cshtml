@@ -62,7 +62,7 @@
                     actionUrl = Url.Action("Edit", "Booking", new { date = currentSlotDate.ToString("yyyy-MM-dd HH:mm") });
                 }
                 <div class="slot-card @statusClass"
-                     onclick="location.href='@actionUrl'">
+                     onclick="location.href='@(Dnn.User.UserID <= 0 && booking == null ? DotNetNuke.Common.Globals.LoginURL(Request.RawUrl, false) : actionUrl)'">
                     @statusText
                 </div>
             }
