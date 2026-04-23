@@ -21,7 +21,7 @@ namespace OnlyRide.Dnn.ServiceBooking.Controllers
             {
                 ServiceBookingManager.Instance.DeleteBooking(booking);
             }
-            return RedirectToDefaultRoute();
+            return Redirect(Globals.NavigateURL(PortalSettings.ActiveTab.TabID));
         }
 
         public ActionResult Edit(int bookingId = -1, string date = "")
@@ -73,16 +73,17 @@ namespace OnlyRide.Dnn.ServiceBooking.Controllers
                     }
                 }
 
-                return Redirect(DotNetNuke.Common.Globals.NavigateURL());
+                return Redirect(Globals.NavigateURL(PortalSettings.ActiveTab.TabID));
             }
             catch (Exception ex)
             {
                 return Content("MENTÉSI HIBA TÖRTÉNT: " + ex.Message);
             }
         }
-        public ActionResult Index()
+        public ActionResult Index(int weekOffset = 0)
         {
             var bookings = ServiceBookingManager.Instance.GetBookings(ModuleContext.ModuleId);
+            ViewBag.WeekOffset = weekOffset;
             return View(bookings);
         }
 
@@ -94,7 +95,7 @@ namespace OnlyRide.Dnn.ServiceBooking.Controllers
                 booking.Status = "Lemondva";
                 ServiceBookingManager.Instance.UpdateBooking(booking);
             }
-            return Redirect(DotNetNuke.Common.Globals.NavigateURL());
+            return Redirect(Globals.NavigateURL(PortalSettings.ActiveTab.TabID));
         }
     }
 }

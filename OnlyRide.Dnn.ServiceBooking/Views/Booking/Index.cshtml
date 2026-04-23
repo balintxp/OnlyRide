@@ -7,16 +7,23 @@
     var hu = new System.Globalization.CultureInfo("hu-HU");
     var today = DateTime.Today;
     int diff = (7 + (today.DayOfWeek - DayOfWeek.Monday)) % 7;
-    var monday = today.AddDays(-1 * diff).Date;
-
+    int weekOffset = ViewBag.WeekOffset ?? 0;
+    var monday = today.AddDays(-1 * diff).AddDays(weekOffset * 7).Date;
     var weekNum = hu.Calendar.GetWeekOfYear(monday, System.Globalization.CalendarWeekRule.FirstFourDayWeek, DayOfWeek.Monday);
 }
 
 <div class="onlyride-calendar">
+    @if (Dnn.User.UserID <= 0)
+    {
+        <div class="onlyride-login-banner">
+            A foglaláshoz kérjük
+            <a href="@DotNetNuke.Common.Globals.LoginURL(Request.RawUrl, false)">jelentkezzen be</a>!
+        </div>
+    }
     <div class="calendar-controls">
-        <button class="dnnSecondaryAction">&lt;</button>
+        <a href="@Url.Action("Index", "Booking", new { weekOffset = (int)ViewBag.WeekOffset - 1, mid = Dnn.ModuleContext.ModuleId })" class="dnnSecondaryAction">&lt;</a>
         <span class="week-selector">@monday.Year. @weekNum. hét (@monday.ToString("MMM. dd.", hu) - @monday.AddDays(6).ToString("MMM. dd.", hu))</span>
-        <button class="dnnSecondaryAction">&gt;</button>
+        <a href="@Url.Action("Index", "Booking", new { weekOffset = (int)ViewBag.WeekOffset + 1, mid = Dnn.ModuleContext.ModuleId })" class="dnnSecondaryAction">&gt;</a>
 
         <div class="calendar-legend">
             <span class="legend-item"><span class="dot szabad"></span> Szabad</span>
@@ -43,11 +50,17 @@
             {
                 var currentSlotDate = monday.AddDays(day).AddHours(hour);
                 var booking = Model.FirstOrDefault(b => b.CreatedOnDate.Date == currentSlotDate.Date && b.CreatedOnDate.Hour == hour && b.Status != "Lemondva");
+                bool isPast = currentSlotDate < DateTime.Now;
                 string statusClass = "status-szabad";
                 string statusText = "Szabad";
                 string actionUrl = "#";
 
-                if (booking != null)
+                if (isPast && booking == null)
+                {
+                    statusClass = "status-lejart";
+                    statusText = "";
+                }
+                else if (booking != null)
                 {
                     bool isMine = booking.UserId == Dnn.User.UserID;
                     bool isAdmin = Dnn.User.IsSuperUser || Dnn.ModuleContext.IsEditable;
@@ -62,7 +75,7 @@
                     actionUrl = Url.Action("Edit", "Booking", new { date = currentSlotDate.ToString("yyyy-MM-dd HH:mm") });
                 }
                 <div class="slot-card @statusClass"
-                     onclick="location.href='@(Dnn.User.UserID <= 0 && booking == null ? DotNetNuke.Common.Globals.LoginURL(Request.RawUrl, false) : actionUrl)'">
+                     onclick="location.href='@actionUrl'">
                     @statusText
                 </div>
             }
