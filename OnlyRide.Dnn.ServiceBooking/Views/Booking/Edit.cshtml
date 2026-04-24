@@ -33,6 +33,41 @@
         </select>
     </div>
 
+    @{
+        var vehicle = ViewBag.Vehicle as OnlyRide.Dnn.ServiceBooking.Models.Vehicle;
+    }
+
+    <div class="onlyride-form-group">
+        <label>Jármű típusa</label>
+        <select name="VehicleType" class="form-control"
+                onchange="document.getElementById('egyeb-mezo').style.display = this.value == 'Egyéb' ? 'block' : 'none'">
+            @foreach (var vt in new[] { "Elektromos roller", "Elektromos bicikli", "Hoverboard", "Elektromos gördeszka", "Egyéb" })
+            {
+                <option value="@vt" @(vehicle != null && vehicle.VehicleType == vt ? "selected" : "")>@vt</option>
+            }
+        </select>
+    </div>
+    <div class="onlyride-form-group" id="egyeb-mezo" style="display:none;">
+        <label>Egyéb jármű leírása</label>
+        <input type="text" name="VehicleNotes" class="form-control"
+               value="@(vehicle != null ? vehicle.Notes : "")" />
+    </div>
+    <div class="onlyride-form-group">
+        <label>Márka</label>
+        <input type="text" name="Brand" class="form-control"
+               value="@(vehicle != null ? vehicle.Brand : "")" />
+    </div>
+    <div class="onlyride-form-group">
+        <label>Modell</label>
+        <input type="text" name="VehicleModel" class="form-control"
+               value="@(vehicle != null ? vehicle.Model : "")" />
+    </div>
+    <div class="onlyride-form-group">
+        <label>Sorozatszám</label>
+        <input type="text" name="SerialNumber" class="form-control"
+               value="@(vehicle != null ? vehicle.SerialNumber : "")" />
+    </div>
+
     <div class="onlyride-form-group">
         <label>Hiba leírása</label>
         <textarea name="CustomNote" rows="4" placeholder="Írd le a problémát...">@Model.CustomNote</textarea>

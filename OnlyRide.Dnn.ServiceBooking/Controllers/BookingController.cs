@@ -37,6 +37,11 @@ namespace OnlyRide.Dnn.ServiceBooking.Controllers
                     Status = "Függőben"
                 }
                 : ServiceBookingManager.Instance.GetBooking(bookingId, ModuleContext.ModuleId);
+            // Vehicle adatok betöltése ha már létező foglalás
+            if (booking.BookingId > 0)
+            {
+                ViewBag.Vehicle = ServiceBookingManager.Instance.GetVehicleByBooking(booking.BookingId);
+            }
 
             return View(booking);
         }
@@ -47,7 +52,7 @@ namespace OnlyRide.Dnn.ServiceBooking.Controllers
         {
             if (!ModelState.IsValid)
             {
-                return View(booking); 
+                return View(booking);
             }
             try
             {
@@ -59,8 +64,21 @@ namespace OnlyRide.Dnn.ServiceBooking.Controllers
                     booking.ServiceTypeId = booking.ServiceTypeId > 0 ? booking.ServiceTypeId : 1;
                     booking.EstimatedPrice = 0;
                     booking.Status = "Függőben";
-
                     ServiceBookingManager.Instance.CreateBooking(booking);
+
+                    if (booking.BookingId > 0)
+                    {
+                        var vehicle = new Vehicle
+                        {
+                            BookingId = booking.BookingId,
+                            VehicleType = Request.Form["VehicleType"],
+                            Brand = Request.Form["Brand"],
+                            Model = Request.Form["VehicleModel"],
+                            SerialNumber = Request.Form["SerialNumber"],
+                            Notes = Request.Form["VehicleNotes"]
+                        };
+                        ServiceBookingManager.Instance.CreateVehicle(vehicle);
+                    }
                 }
                 else
                 {
@@ -72,7 +90,6 @@ namespace OnlyRide.Dnn.ServiceBooking.Controllers
                         ServiceBookingManager.Instance.UpdateBooking(existing);
                     }
                 }
-
                 return Redirect(Globals.NavigateURL(PortalSettings.ActiveTab.TabID));
             }
             catch (Exception ex)
