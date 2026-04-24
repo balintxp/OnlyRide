@@ -2,88 +2,119 @@
 @using DotNetNuke.Web.Mvc.Helpers
 
 <div class="onlyride-edit-card">
+    @{
+        bool isEditable = ViewBag.IsEditable ?? true;
+    }
     <h2>Időpont foglalása</h2>
 
     @* Manuális form, de az URL-be kényszerítjük a mid-et és tabid-et *@
-<form action="@Url.Action("Edit", "Booking")?mid=@Dnn.ModuleContext.ModuleId&tabid=@Dnn.PortalSettings.ActiveTab.TabID" method="post">
-    @Html.AntiForgeryToken()
+    <form action="@Url.Action("Edit", "Booking")?mid=@Dnn.ModuleContext.ModuleId&tabid=@Dnn.PortalSettings.ActiveTab.TabID" method="post">
+        @Html.AntiForgeryToken()
 
-    @* LÉTFONTOSSÁGÚ: A DNN ezen mezők alapján talál vissza az Indexre *@
-    <input type="hidden" name="mid" value="@Dnn.ModuleContext.ModuleId" />
-    <input type="hidden" name="BookingId" value="@Model.BookingId" />
-    <input type="hidden" name="ModuleId" value="@Dnn.ModuleContext.ModuleId" />
-    <input type="hidden" name="SlotId" value="@Model.SlotId" />
-    <input type="hidden" name="UserId" value="@Dnn.User.UserID" />
+        @* LÉTFONTOSSÁGÚ: A DNN ezen mezők alapján talál vissza az Indexre *@
+        <input type="hidden" name="mid" value="@Dnn.ModuleContext.ModuleId" />
+        <input type="hidden" name="BookingId" value="@Model.BookingId" />
+        <input type="hidden" name="ModuleId" value="@Dnn.ModuleContext.ModuleId" />
+        <input type="hidden" name="SlotId" value="@Model.SlotId" />
+        <input type="hidden" name="UserId" value="@Dnn.User.UserID" />
 
-    <div class="onlyride-form-group">
-        <label>Választott időpont</label>
-        <input type="text" value="@Model.CreatedOnDate.ToString("yyyy. MM. dd. HH:mm")" readonly style="background:#f5f5f5;" />
-        <input type="hidden" name="CreatedOnDate" value="@Model.CreatedOnDate.ToString("yyyy-MM-dd HH:mm")" />
-    </div>
+        <div class="onlyride-form-group">
+            <label>Választott időpont</label>
+            <input type="text" value="@Model.CreatedOnDate.ToString("yyyy. MM. dd. HH:mm")" readonly style="background:#f5f5f5;" />
+            <input type="hidden" name="CreatedOnDate" value="@Model.CreatedOnDate.ToString("yyyy-MM-dd HH:mm")" />
+        </div>
 
-    <div class="onlyride-form-group">
-        <label>Szolgáltatás típusa</label>
-        <select name="ServiceTypeId" class="form-control">
-            @foreach (var st in (IEnumerable<OnlyRide.Dnn.ServiceBooking.Models.ServiceType>)ViewBag.ServiceTypes)
-            {
-                <option value="@st.ServiceTypeId" @(Model.ServiceTypeId == st.ServiceTypeId ? "selected" : "")>
-                    @st.Name
-                </option>
+        <div class="onlyride-form-group">
+            <label>Szolgáltatás típusa</label>
+            <select name="ServiceTypeId" class="form-control" id="serviceTypeSelect" onchange="updateEstimate()"
+                    @(!isEditable ? "disabled" : "")>
+                @foreach (var st in (IEnumerable<OnlyRide.Dnn.ServiceBooking.Models.ServiceType>)ViewBag.ServiceTypes)
+                {
+                    <option value="@st.ServiceTypeId"
+                            data-price="@st.BasePrice"
+                            data-minutes="@st.EstimatedMinutes"
+                            @(Model.ServiceTypeId == st.ServiceTypeId ? "selected" : "")>
+                        @st.Name
+                    </option>
+                }
+            </select>
+        </div>
+        <div class="onlyride-form-group">
+            <label>Becsült ár és idő</label>
+            <input type="text" id="estimateDisplay" readonly style="background:#f5f5f5;" />
+        </div>
+
+        <script>
+            function updateEstimate() {
+                var select = document.getElementById('serviceTypeSelect');
+                var option = select.options[select.selectedIndex];
+                var price = option.getAttribute('data-price');
+                var minutes = option.getAttribute('data-minutes');
+                document.getElementById('estimateDisplay').value = price + ' Ft  |  ' + minutes + ' perc';
             }
-        </select>
-    </div>
+            updateEstimate();
+        </script>
 
-    @{
-        var vehicle = ViewBag.Vehicle as OnlyRide.Dnn.ServiceBooking.Models.Vehicle;
-    }
-
-    <div class="onlyride-form-group">
-        <label>Jármű típusa</label>
-        <select name="VehicleType" class="form-control"
-                onchange="document.getElementById('egyeb-mezo').style.display = this.value == 'Egyéb' ? 'block' : 'none'">
-            @foreach (var vt in new[] { "Elektromos roller", "Elektromos bicikli", "Hoverboard", "Elektromos gördeszka", "Egyéb" })
-            {
-                <option value="@vt" @(vehicle != null && vehicle.VehicleType == vt ? "selected" : "")>@vt</option>
-            }
-        </select>
-    </div>
-    <div class="onlyride-form-group" id="egyeb-mezo" style="display:none;">
-        <label>Egyéb jármű leírása</label>
-        <input type="text" name="VehicleNotes" class="form-control"
-               value="@(vehicle != null ? vehicle.Notes : "")" />
-    </div>
-    <div class="onlyride-form-group">
-        <label>Márka</label>
-        <input type="text" name="Brand" class="form-control"
-               value="@(vehicle != null ? vehicle.Brand : "")" />
-    </div>
-    <div class="onlyride-form-group">
-        <label>Modell</label>
-        <input type="text" name="VehicleModel" class="form-control"
-               value="@(vehicle != null ? vehicle.Model : "")" />
-    </div>
-    <div class="onlyride-form-group">
-        <label>Sorozatszám</label>
-        <input type="text" name="SerialNumber" class="form-control"
-               value="@(vehicle != null ? vehicle.SerialNumber : "")" />
-    </div>
-
-    <div class="onlyride-form-group">
-        <label>Hiba leírása</label>
-        <textarea name="CustomNote" rows="4" placeholder="Írd le a problémát...">@Model.CustomNote</textarea>
-    </div>
-
-    <div class="onlyride-actions">
-        <button type="submit" class="btn-confirm">Foglalás megerősítése</button>
-        @if (Model.BookingId > 0 && (Model.UserId == Dnn.User.UserID || Dnn.User.IsSuperUser || Dnn.ModuleContext.IsEditable))
-        {
-            <a href="@Url.Action("Cancel", "Booking", new { bookingId = Model.BookingId })"
-               class="btn-cancel"
-               onclick="return confirm('Biztosan lemondja a foglalást?');">
-                Lemondás
-            </a>
+        @{
+            var vehicle = ViewBag.Vehicle as OnlyRide.Dnn.ServiceBooking.Models.Vehicle;
         }
-        <a href="@Url.Action("Index", "Booking")" class="btn-cancel">Mégse</a>
-    </div>
+
+        <div class="onlyride-form-group">
+            <label>Jármű típusa</label>
+            <select name="VehicleType" class="form-control"
+                    onchange="document.getElementById('egyeb-mezo').style.display = this.value == 'Egyéb' ? 'block' : 'none'"
+                    @(!isEditable ? "disabled" : "")>
+                @foreach (var vt in new[] { "Elektromos roller", "Elektromos bicikli", "Hoverboard", "Elektromos gördeszka", "Egyéb" })
+                {
+                    <option value="@vt" @(vehicle != null && vehicle.VehicleType == vt ? "selected" : "")>@vt</option>
+                }
+            </select>
+        </div>
+        <div class="onlyride-form-group" id="egyeb-mezo" style="display:none;">
+            <label>Egyéb jármű leírása</label>
+            <input type="text" name="VehicleNotes" class="form-control"
+                   value="@(vehicle != null ? vehicle.Notes : "")"
+                   @(!isEditable ? "readonly style='background:#f5f5f5;'" : "")/>
+        </div>
+        <div class="onlyride-form-group">
+            <label>Márka</label>
+            <input type="text" name="Brand" class="form-control"
+                   value="@(vehicle != null ? vehicle.Brand : "")"
+                   @(!isEditable ? "readonly style='background:#f5f5f5;'" : "")/>
+        </div>
+        <div class="onlyride-form-group">
+            <label>Modell</label>
+            <input type="text" name="VehicleModel" class="form-control"
+                   value="@(vehicle != null ? vehicle.Model : "")" 
+                   @(!isEditable ? "readonly style='background:#f5f5f5;'" : "")/>
+        </div>
+        <div class="onlyride-form-group">
+            <label>Sorozatszám</label>
+            <input type="text" name="SerialNumber" class="form-control"
+                   value="@(vehicle != null ? vehicle.SerialNumber : "")"
+                   @(!isEditable ? "readonly style='background:#f5f5f5;'" : "")/>
+        </div>
+
+        <div class="onlyride-form-group">
+            <label>Hiba leírása</label>
+            <textarea name="CustomNote" rows="4" placeholder="Írd le a problémát..."
+                      @(!isEditable ? "readonly style='background:#f5f5f5;'" : "")>@Model.CustomNote</textarea>
+        </div>
+
+            <div class="onlyride-actions">
+                @if (isEditable)
+                {
+                    <button type="submit" class="btn-confirm">Foglalás megerősítése</button>
+                }
+                @if (Model.BookingId > 0 && (Model.UserId == Dnn.User.UserID || Dnn.User.IsSuperUser || Dnn.ModuleContext.IsEditable))
+                {
+                    <a href="@Url.Action("Cancel", "Booking", new { bookingId = Model.BookingId })"
+                       class="btn-cancel"
+                       onclick="return confirm('Biztosan lemondja a foglalást?');">
+                        Lemondás
+                    </a>
+                }
+                <a href="@Url.Action("Index", "Booking")" class="btn-cancel">Mégse</a>
+            </div>
 </form>
 </div>

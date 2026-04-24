@@ -24,6 +24,7 @@ namespace OnlyRide.Dnn.ServiceBooking.Controllers
             return Redirect(Globals.NavigateURL(PortalSettings.ActiveTab.TabID));
         }
 
+        [HttpGet]
         public ActionResult Edit(int bookingId = -1, string date = "")
         {
 
@@ -41,12 +42,17 @@ namespace OnlyRide.Dnn.ServiceBooking.Controllers
             if (booking.BookingId > 0)
             {
                 ViewBag.Vehicle = ServiceBookingManager.Instance.GetVehicleByBooking(booking.BookingId);
+                ViewBag.IsEditable = booking.CreatedOnDate.Date >= DateTime.Now.Date.AddDays(1);
+            }
+            else
+            {
+                ViewBag.IsEditable = true;
             }
 
             return View(booking);
         }
 
-        [HttpPost]
+            [HttpPost]
         //[DotNetNuke.Web.Mvc.Framework.ActionFilters.ValidateAntiForgeryToken]
         public ActionResult Edit(Booking booking)
         {
@@ -88,6 +94,18 @@ namespace OnlyRide.Dnn.ServiceBooking.Controllers
                         existing.ServiceTypeId = booking.ServiceTypeId;
                         existing.CustomNote = booking.CustomNote;
                         ServiceBookingManager.Instance.UpdateBooking(existing);
+
+                        // Vehicle frissítése is kell!
+                        var existingVehicle = ServiceBookingManager.Instance.GetVehicleByBooking(booking.BookingId);
+                        if (existingVehicle != null)
+                        {
+                            existingVehicle.VehicleType = Request.Form["VehicleType"];
+                            existingVehicle.Brand = Request.Form["Brand"];
+                            existingVehicle.Model = Request.Form["VehicleModel"];
+                            existingVehicle.SerialNumber = Request.Form["SerialNumber"];
+                            existingVehicle.Notes = Request.Form["VehicleNotes"];
+                            ServiceBookingManager.Instance.UpdateVehicle(existingVehicle);
+                        }
                     }
                 }
                 return Redirect(Globals.NavigateURL(PortalSettings.ActiveTab.TabID));
