@@ -1,4 +1,6 @@
-/* A naptár fõ rácsa */
+/* NAPTÁR - Rács és fejléc* /
+
+/* A naptár fõ rácsa - 8 oszlop: idõcímke + 7 nap */
 .onlyride-calendar .calendar-grid {
     display: grid !important;
     grid-template-columns: 80px repeat(7, 1fr) !important;
@@ -10,7 +12,7 @@
     width: 100%;
 }
 
-/* Oszlopok fejléce */
+/* Oszlopfejlécek - napok nevei és dátumai */
 .onlyride-calendar .grid-header {
     text-align: center;
     padding: 10px;
@@ -19,7 +21,9 @@
     font-weight: bold;
 }
 
-/* Egy idõsáv kártyája (Slot) */
+/* NAPTÁR - Slot kártyák */
+
+/* Egy idõsáv kártyájának alap stílusa */
 .onlyride-calendar .slot-card {
     display: flex;
     align-items: center;
@@ -37,39 +41,67 @@
     transition: transform 0.2s, filter 0.2s;
 }
 
-/* Hover a naptár kártyákon - NINCS KÉK */
-.onlyride-calendar .slot-card:hover {
-    transform: translateY(-2px);
-    filter: brightness(0.95);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1) !important;
-}
+    /* Hover effekt a slot kártyákon */
+    .onlyride-calendar .slot-card:hover {
+        transform: translateY(-2px);
+        filter: brightness(0.95);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1) !important;
+    }
 
-/* Színkódok a Figma alapján */
+/* NAPTÁR - Slot színkódok */
+
+/* Szabad idõpont - zöld */
 .onlyride-calendar .status-szabad {
     background-color: #e6f9ed !important;
     color: #2ecc71 !important;
     border-color: #2ecc71 !important;
 }
 
+/* Foglalt idõpont - piros */
 .onlyride-calendar .status-foglalt {
     background-color: #fdeaea !important;
     color: #e74c3c !important;
     border-color: #e74c3c !important;
 }
 
+/* Saját foglalás - kék */
 .onlyride-calendar .status-sajat {
     background-color: #eef2ff !important;
     color: #4361ee !important;
     border-color: #4361ee !important;
 }
 
+/* Lejárt/múltbeli idõpont - szürke, nem kattintható */
 .onlyride-calendar .status-lejart {
     background-color: #f5f5f5 !important;
     color: #a0a0a0 !important;
     border-color: #d0d0d0 !important;
+    cursor: default !important;
 }
 
-/* Legenda pöttyök stílusa */
+/* Folyamatban lévõ szerviz - sárga */
+.onlyride-calendar .status-folyamatban {
+    background-color: #fffbe6 !important;
+    color: #f39c12 !important;
+    border-color: #f39c12 !important;
+}
+
+/* Kész szerviz - fuchsia */
+.onlyride-calendar .status-kesz {
+    background-color: #fdf0ff !important;
+    color: #c0157a !important;
+    border-color: #c0157a !important;
+}
+
+/* NAPTÁR - Jelmagyarázat */
+
+.calendar-controls {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+    gap: 10px;
+}
+
 .calendar-legend {
     display: flex;
     gap: 20px;
@@ -83,6 +115,7 @@
     align-items: center;
 }
 
+/* Jelmagyarázat pöttyök */
 .dot {
     height: 12px;
     width: 12px;
@@ -91,19 +124,33 @@
     margin-right: 8px;
 }
 
-.dot.szabad {
-    background-color: #2ecc71;
-}
+    .dot.szabad {
+        background-color: #2ecc71;
+    }
 
-.dot.foglalt {
-    background-color: #e74c3c;
-}
+    .dot.foglalt {
+        background-color: #e74c3c;
+    }
 
-.dot.sajat {
-    background-color: #4361ee;
-}
+    .dot.sajat {
+        background-color: #4361ee;
+    }
 
-/* Edit kártya konténer */
+    .dot.folyamatban {
+        background-color: #f39c12;
+    }
+
+    .dot.kesz {
+        background-color: #c0157a;
+    }
+
+    .dot.lejart {
+        background-color: #a0a0a0;
+    }
+
+/* EDIT KÁRTYA - Foglalási és admin ûrlap */
+
+/* Fõ konténer */
 .onlyride-edit-card {
     max-width: 500px;
     margin: 40px auto;
@@ -114,54 +161,105 @@
     border: 1px solid #f0f0f0;
 }
 
-.onlyride-edit-card h2 {
-    font-size: 24px;
-    font-weight: 700;
-    color: #1a1a1a;
-    margin-bottom: 25px;
-    text-align: center;
-    border: none;
-}
+    .onlyride-edit-card h2 {
+        font-size: 24px;
+        font-weight: 700;
+        color: #1a1a1a;
+        margin-bottom: 25px;
+        text-align: center;
+        border: none;
+    }
 
-/* Mezõk stílusa */
+    .onlyride-edit-card h3 {
+        font-size: 18px;
+        font-weight: 700;
+        color: #1a1a1a;
+        margin: 25px 0 15px 0;
+        border-top: 2px solid #f0f0f0;
+        padding-top: 20px;
+    }
+
+/* EDIT KÁRTYA - Mezõk */
+
 .onlyride-form-group {
     margin-bottom: 20px;
 }
 
-.onlyride-form-group label {
-    display: block;
+    .onlyride-form-group label {
+        display: block;
+        font-weight: 600;
+        margin-bottom: 8px;
+        color: #4a4a4a;
+    }
+
+    .onlyride-form-group input,
+    .onlyride-form-group select,
+    .onlyride-form-group textarea {
+        width: 100% !important;
+        padding: 12px 15px !important;
+        border: 2px solid #edf2f7 !important;
+        border-radius: 10px !important;
+        font-size: 15px !important;
+        transition: border-color 0.2s;
+        box-sizing: border-box;
+    }
+
+        .onlyride-form-group input:focus {
+            border-color: #2ecc71 !important;
+            outline: none;
+        }
+
+    .onlyride-form-group select {
+        height: 48px !important;
+        padding: 10px 15px !important;
+        line-height: 1.5 !important;
+    }
+
+/* EDIT KÁRTYA - Admin összefoglaló nézet */
+
+/* Összefoglaló kártya az admin nézetben */
+.onlyride-detail-card {
+    background: #f9f9f9;
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 20px;
+    border: 1px solid #edf2f7;
+}
+
+/* Egy sor az összefoglalóban - cimke és érték */
+.onlyride-detail-row {
+    display: flex;
+    padding: 8px 0;
+    border-bottom: 1px solid #edf2f7;
+}
+
+    .onlyride-detail-row:last-child {
+        border-bottom: none;
+    }
+
+.onlyride-detail-label {
     font-weight: 600;
-    margin-bottom: 8px;
     color: #4a4a4a;
+    width: 140px;
+    min-width: 140px;
 }
 
-.onlyride-form-group input,
-.onlyride-form-group select,
-.onlyride-form-group textarea {
-    width: 100% !important;
-    padding: 12px 15px !important;
-    border: 2px solid #edf2f7 !important;
-    border-radius: 10px !important;
-    font-size: 15px !important;
-    transition: border-color 0.2s;
-    box-sizing: border-box;
+.onlyride-detail-value {
+    color: #1a1a1a;
 }
 
-.onlyride-form-group input:focus {
-    border-color: #2ecc71 !important;
-    outline: none;
-}
+/* GOMBOK */
 
-/* Gombok stílusa */
 .onlyride-actions {
     display: flex;
     gap: 15px;
     margin-top: 30px;
 }
 
+/* Fõ akció gomb - zöld */
 .btn-confirm {
     flex: 2;
-    background-color: #2ecc71 !important; /* Figma zöld */
+    background-color: #2ecc71 !important;
     color: white !important;
     padding: 12px;
     border-radius: 10px !important;
@@ -172,13 +270,13 @@
     transition: background-color 0.2s;
 }
 
-/* Hover állapot: Sötétebb zöld, NEM kék */
-.btn-confirm:hover {
-    background-color: #27ae60 !important;
-    color: white !important;
-    box-shadow: none !important;
-}
+    .btn-confirm:hover {
+        background-color: #27ae60 !important;
+        color: white !important;
+        box-shadow: none !important;
+    }
 
+/* Másodlagos gomb - szürke (Mégse, Lemondás) */
 .btn-cancel {
     flex: 1;
     background-color: #f1f3f5 !important;
@@ -189,17 +287,14 @@
     text-decoration: none !important;
 }
 
-.btn-cancel:hover {
-    background-color: #e9ecef !important;
-    color: #495057 !important;
-}
+    .btn-cancel:hover {
+        background-color: #e9ecef !important;
+        color: #495057 !important;
+    }
 
-.onlyride-form-group select {
-    height: 48px !important;
-    padding: 10px 15px !important;
-    line-height: 1.5 !important;
-}
+/* BEJELENTKEZÉSI BANNER */
 
+/* Csak nem bejelentkezett usernek látszik */
 .onlyride-login-banner {
     text-align: center;
     padding: 15px;

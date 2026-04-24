@@ -14,6 +14,7 @@ namespace OnlyRide.Dnn.ServiceBooking.Controllers
     [DnnHandleError]
     public class BookingController : DnnController
     {
+        // Foglalás törlése - csak admin használja
         public ActionResult Delete(int bookingId)
         {
             var booking = ServiceBookingManager.Instance.GetBooking(bookingId, ModuleContext.ModuleId);
@@ -24,10 +25,10 @@ namespace OnlyRide.Dnn.ServiceBooking.Controllers
             return Redirect(Globals.NavigateURL(PortalSettings.ActiveTab.TabID));
         }
 
+        // Foglalás megnyitása - új foglaláskor date paraméter jön, meglévőnél bookingId
         [HttpGet]
         public ActionResult Edit(int bookingId = -1, string date = "")
         {
-
             ViewBag.ServiceTypes = ServiceBookingManager.Instance.GetServiceTypes(ModuleContext.ModuleId);
 
             var booking = (bookingId == -1 || bookingId == 0)
@@ -38,22 +39,34 @@ namespace OnlyRide.Dnn.ServiceBooking.Controllers
                     Status = "Függőben"
                 }
                 : ServiceBookingManager.Instance.GetBooking(bookingId, ModuleContext.ModuleId);
-            // Vehicle adatok betöltése ha már létező foglalás
+
+            // Meglévő foglalásnál betöltjük a jármű adatokat és ellenőrizzük szerkeszthetőséget
+            // Csak holnap vagy később szerkeszthető
             if (booking.BookingId > 0)
             {
                 ViewBag.Vehicle = ServiceBookingManager.Instance.GetVehicleByBooking(booking.BookingId);
                 ViewBag.IsEditable = booking.CreatedOnDate.Date >= DateTime.Now.Date.AddDays(1);
+
+                // Foglaló felhasználó adatainak betöltése
+                var bookingUser = DotNetNuke.Entities.Users.UserController.GetUserById(PortalSettings.PortalId, booking.UserId);
+                if (bookingUser != null)
+                {
+                    ViewBag.BookingUserName = bookingUser.DisplayName;
+                    ViewBag.BookingUserEmail = bookingUser.Email;
+                }
             }
             else
             {
+                // Új foglalás mindig szerkeszthető
                 ViewBag.IsEditable = true;
             }
 
             return View(booking);
         }
 
-            [HttpPost]
-        //[DotNetNuke.Web.Mvc.Framework.ActionFilters.ValidateAntiForgeryToken]
+        // Foglalás mentése - új foglalásnál INSERT, meglévőnél UPDATE
+        [HttpPost]
+        //[ValidateAntiForgeryToken] // kikommentelve DNN kompatibilitási okból
         public ActionResult Edit(Booking booking)
         {
             if (!ModelState.IsValid)
@@ -64,6 +77,7 @@ namespace OnlyRide.Dnn.ServiceBooking.Controllers
             {
                 if (booking.BookingId <= 0)
                 {
+                    // Új foglalás létrehozása
                     booking.UserId = User.UserID;
                     booking.ModuleId = ModuleContext.ModuleId;
                     booking.SlotId = booking.SlotId > 0 ? booking.SlotId : 0;
@@ -72,7 +86,8 @@ namespace OnlyRide.Dnn.ServiceBooking.Controllers
                     booking.Status = "Függőben";
                     ServiceBookingManager.Instance.CreateBooking(booking);
 
-                    if (booking.BookingId > 0)
+                    // Jármű adatok mentése az új foglaláshoz
+                    if (booking.BookingId > 0 && !string.IsNullOrEmpty(Request.Form["VehicleType"]))
                     {
                         var vehicle = new Vehicle
                         {
@@ -88,6 +103,7 @@ namespace OnlyRide.Dnn.ServiceBooking.Controllers
                 }
                 else
                 {
+                    // Meglévő foglalás frissítése
                     var existing = ServiceBookingManager.Instance.GetBooking(booking.BookingId, ModuleContext.ModuleId);
                     if (existing != null)
                     {
@@ -95,9 +111,9 @@ namespace OnlyRide.Dnn.ServiceBooking.Controllers
                         existing.CustomNote = booking.CustomNote;
                         ServiceBookingManager.Instance.UpdateBooking(existing);
 
-                        // Vehicle frissítése is kell!
+                        // Jármű adatok frissítése
                         var existingVehicle = ServiceBookingManager.Instance.GetVehicleByBooking(booking.BookingId);
-                        if (existingVehicle != null)
+                        if (existingVehicle != null && !string.IsNullOrEmpty(Request.Form["VehicleType"]))
                         {
                             existingVehicle.VehicleType = Request.Form["VehicleType"];
                             existingVehicle.Brand = Request.Form["Brand"];
@@ -115,6 +131,30 @@ namespace OnlyRide.Dnn.ServiceBooking.Controllers
                 return Content("MENTÉSI HIBA TÖRTÉNT: " + ex.Message);
             }
         }
+
+        // Admin szerviz lezárás - ActualMinutes, ActualPrice és státusz frissítése
+        [HttpPost]
+        public ActionResult AdminComplete(Booking booking)
+        {
+            try
+            {
+                var existing = ServiceBookingManager.Instance.GetBooking(booking.BookingId, ModuleContext.ModuleId);
+                if (existing != null && (User.IsSuperUser || ModuleContext.IsEditable))
+                {
+                    existing.Status = booking.Status;
+                    existing.ActualMinutes = booking.ActualMinutes;
+                    existing.ActualPrice = booking.ActualPrice;
+                    ServiceBookingManager.Instance.UpdateBooking(existing);
+                }
+                return Redirect(Globals.NavigateURL(PortalSettings.ActiveTab.TabID));
+            }
+            catch (Exception ex)
+            {
+                return Content("MENTÉSI HIBA TÖRTÉNT: " + ex.Message);
+            }
+        }
+
+        // Naptár megjelenítése - weekOffset alapján váltogatja a heteket
         public ActionResult Index(int weekOffset = 0)
         {
             var bookings = ServiceBookingManager.Instance.GetBookings(ModuleContext.ModuleId);
@@ -122,6 +162,7 @@ namespace OnlyRide.Dnn.ServiceBooking.Controllers
             return View(bookings);
         }
 
+        // Foglalás lemondása - státusz "Lemondva"-ra vált, csak saját vagy admin mondhatja le
         public ActionResult Cancel(int bookingId)
         {
             var booking = ServiceBookingManager.Instance.GetBooking(bookingId, ModuleContext.ModuleId);
