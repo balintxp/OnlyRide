@@ -115,7 +115,7 @@ namespace Hotcakespicemanager
 
         private void button2_Click(object sender, EventArgs e)
         {
-            
+
             ApplyFilter();
         }
 
@@ -216,7 +216,8 @@ namespace Hotcakespicemanager
                 .Where(c => !((c.Name ?? "").ToLower().Contains("szervíz")))
                 .GroupBy(c => c.Name)
                 .Select(g => g.First())
-                .OrderBy(c => c.Name)
+                .OrderBy(c => GetCategoryOrder(c))
+                .ThenBy(c => c.Name)
                 .ToList();
 
             displayCategories.AddRange(uniqueCategories);
@@ -272,9 +273,6 @@ namespace Hotcakespicemanager
             if (name.Contains("ruhak") || name.Contains("ruhák"))
                 return "ID 4";
 
-            if (name.Contains("kerékpár") || name.Contains("kerekpar"))
-                return "ID 11";
-
             if (name.Contains("roller"))
                 return "ID 12";
 
@@ -292,6 +290,9 @@ namespace Hotcakespicemanager
 
             if (name.Contains("hordozó") || name.Contains("hordozo"))
                 return "ID 23";
+
+            if (name.Contains("kerékpár") || name.Contains("kerekpar"))
+                return "ID 11";
 
             if (name.Contains("gumi"))
                 return "ID 31";
@@ -325,5 +326,39 @@ namespace Hotcakespicemanager
 
             return null;
         }
+
+        private int GetCategoryOrder(Category c)
+        {
+            string name = (c.Name ?? "").ToLower();
+
+            if (name.Contains("elektromos eszköz")) return 1;
+            if (name.Contains("elektromos kerékpár")) return 2;
+            if (name.Contains("elektromos roller")) return 3;
+            if (name.Contains("elektromos gördeszkák")) return 4;
+            if (name.Contains("hoverboard")) return 5;
+
+            if (name.Contains("kiegészítő")) return 10;
+            if (name.Contains("csengő")) return 11;
+            if (name.Contains("lámpa")) return 12;
+            if (name.Contains("hordozó")) return 13;
+
+            if (name.Contains("alkatrész")) return 20;
+            if (name.Contains("gumi")) return 21;
+            if (name.Contains("kerék")) return 22;
+            if (name.Contains("fék")) return 23;
+            if (name.Contains("nyereg")) return 24;
+            if (name.Contains("akkumlátor")) return 25;
+
+            if (name.Contains("ruhák")) return 30;
+            if (name.Contains("kesztyű")) return 31;
+            if (name.Contains("mez")) return 32;
+            if (name.Contains("sisak")) return 33;
+            if (name.Contains("szemüveg")) return 34;
+            if (name.Contains("cipő")) return 35;
+
+            return 999;
+        }
+
+
     }
 }

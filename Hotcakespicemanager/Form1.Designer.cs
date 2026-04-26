@@ -44,6 +44,7 @@
             label6 = new Label();
             trackBar2 = new TrackBar();
             listBox1 = new ListBox();
+            checkBox1 = new CheckBox();
             ((System.ComponentModel.ISupportInitialize)trackBar1).BeginInit();
             ((System.ComponentModel.ISupportInitialize)dataGridView1).BeginInit();
             ((System.ComponentModel.ISupportInitialize)trackBar2).BeginInit();
@@ -195,11 +196,22 @@
             listBox1.TabIndex = 19;
             listBox1.SelectedIndexChanged += listBox1_SelectedIndexChanged;
             // 
+            // checkBox1
+            // 
+            checkBox1.AutoSize = true;
+            checkBox1.Location = new Point(847, 174);
+            checkBox1.Name = "checkBox1";
+            checkBox1.Size = new Size(114, 19);
+            checkBox1.TabIndex = 20;
+            checkBox1.Text = "1000-re kerekítés";
+            checkBox1.UseVisualStyleBackColor = true;
+            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(998, 540);
+            Controls.Add(checkBox1);
             Controls.Add(listBox1);
             Controls.Add(trackBar2);
             Controls.Add(label6);
@@ -243,5 +255,6 @@
         private Label label6;
         private TrackBar trackBar2;
         private ListBox listBox1;
+        private CheckBox checkBox1;
     }
 }
