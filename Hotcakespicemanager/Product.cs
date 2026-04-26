@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Newtonsoft.Json;
+using System.Text;
 
 namespace Hotcakespicemanager
 {
@@ -40,5 +41,10 @@ namespace Hotcakespicemanager
     {
         [JsonProperty("Content")]
         public ProductContent Content { get; set; }
+    }
+    public class ProductSingleResponse
+    {
+        [JsonProperty("Content")]
+        public Product Content { get; set; }
     }
 }

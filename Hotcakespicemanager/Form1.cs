@@ -6,6 +6,8 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement;
+using System.Text;
+using Newtonsoft.Json.Linq;
 
 namespace Hotcakespicemanager
 {
@@ -373,7 +375,7 @@ namespace Hotcakespicemanager
             return 999;
         }
 
-        private void button3_Click_1(object sender, EventArgs e)
+        private async void button3_Click_1(object sender, EventArgs e)
         {
             if (!decimal.TryParse(textBox3.Text, out decimal value))
             {
@@ -425,7 +427,71 @@ namespace Hotcakespicemanager
 
             dataGridView1.Refresh();
 
-            MessageBox.Show($"{productsToModify.Count} termék új ára kiszámolva.");
+            var confirm = MessageBox.Show(
+                $"{productsToModify.Count} termék ára módosulni fog. Biztos folytatod?",
+                "Megerősítés",
+                MessageBoxButtons.YesNo,
+                MessageBoxIcon.Warning
+            );
+
+            if (confirm != DialogResult.Yes)
+                return;
+
+            int success = 0;
+
+            foreach (var product in productsToModify)
+            {
+                bool ok = await UpdateProductPriceAsync(product);
+
+                if (ok)
+                    success++;
+            }
+
+            MessageBox.Show($"{success} termék ára sikeresen frissítve.");
+        }
+        private async Task<bool> UpdateProductPriceAsync(Product product)
+        {
+            if (product.NewPrice == null)
+                return false;
+
+            string getEndpoint = $"products/{product.Bvin}?key={API_KEY}";
+
+            var getResponse = await httpClient.GetAsync(getEndpoint);
+            var getJson = await getResponse.Content.ReadAsStringAsync();
+
+            if (!getResponse.IsSuccessStatusCode)
+            {
+                MessageBox.Show($"Nem sikerült lekérni:\n{product.Sku}\n\n{getJson}");
+                return false;
+            }
+
+            var fullJson = JObject.Parse(getJson);
+            var contentObject = fullJson["Content"] as JObject;
+
+            if (contentObject == null)
+            {
+                MessageBox.Show($"Nincs Content objektum:\n{product.Sku}");
+                return false;
+            }
+
+            contentObject["SitePrice"] = product.NewPrice.Value;
+
+            string postEndpoint = $"products?key={API_KEY}";
+            string postJson = contentObject.ToString();
+
+            var content = new StringContent(postJson, Encoding.UTF8, "application/json");
+
+            var postResponse = await httpClient.PostAsync(postEndpoint, content);
+            var postResponseText = await postResponse.Content.ReadAsStringAsync();
+
+            if (!postResponse.IsSuccessStatusCode)
+            {
+                MessageBox.Show($"Hiba a frissítéskor:\n{product.Sku}\n\n{postResponse.StatusCode}\n\n{postResponseText}");
+                return false;
+            }
+
+            product.SitePrice = product.NewPrice.Value;
+            return true;
         }
     }
 }
