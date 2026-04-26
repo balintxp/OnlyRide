@@ -32,7 +32,6 @@
             label2 = new Label();
             label3 = new Label();
             trackBar1 = new TrackBar();
-            comboBox1 = new ComboBox();
             textBox1 = new TextBox();
             textBox2 = new TextBox();
             button1 = new Button();
@@ -40,12 +39,11 @@
             dataGridView1 = new DataGridView();
             button3 = new Button();
             comboBox2 = new ComboBox();
-            comboBox3 = new ComboBox();
             textBox3 = new TextBox();
             label4 = new Label();
-            label5 = new Label();
             label6 = new Label();
             trackBar2 = new TrackBar();
+            listBox1 = new ListBox();
             ((System.ComponentModel.ISupportInitialize)trackBar1).BeginInit();
             ((System.ComponentModel.ISupportInitialize)dataGridView1).BeginInit();
             ((System.ComponentModel.ISupportInitialize)trackBar2).BeginInit();
@@ -54,7 +52,7 @@
             // label1
             // 
             label1.AutoSize = true;
-            label1.Location = new Point(28, 0);
+            label1.Location = new Point(12, 16);
             label1.Name = "label1";
             label1.Size = new Size(57, 15);
             label1.TabIndex = 0;
@@ -86,14 +84,6 @@
             trackBar1.TabIndex = 3;
             trackBar1.Scroll += trackBar1_Scroll;
             // 
-            // comboBox1
-            // 
-            comboBox1.FormattingEnabled = true;
-            comboBox1.Location = new Point(0, 22);
-            comboBox1.Name = "comboBox1";
-            comboBox1.Size = new Size(121, 23);
-            comboBox1.TabIndex = 5;
-            // 
             // textBox1
             // 
             textBox1.Location = new Point(279, 22);
@@ -110,6 +100,7 @@
             // 
             // button1
             // 
+            button1.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             button1.Location = new Point(619, 12);
             button1.Name = "button1";
             button1.Size = new Size(75, 23);
@@ -120,6 +111,7 @@
             // 
             // button2
             // 
+            button2.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             button2.Location = new Point(713, 12);
             button2.Name = "button2";
             button2.Size = new Size(75, 23);
@@ -130,15 +122,17 @@
             // 
             // dataGridView1
             // 
+            dataGridView1.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             dataGridView1.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            dataGridView1.Location = new Point(0, 51);
+            dataGridView1.Location = new Point(135, 51);
             dataGridView1.Name = "dataGridView1";
-            dataGridView1.Size = new Size(788, 332);
+            dataGridView1.Size = new Size(503, 332);
             dataGridView1.TabIndex = 10;
             dataGridView1.CellContentClick += dataGridView1_CellContentClick;
             // 
             // button3
             // 
+            button3.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
             button3.Location = new Point(713, 415);
             button3.Name = "button3";
             button3.Size = new Size(75, 23);
@@ -148,49 +142,36 @@
             // 
             // comboBox2
             // 
+            comboBox2.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             comboBox2.FormattingEnabled = true;
-            comboBox2.Location = new Point(169, 416);
+            comboBox2.Location = new Point(644, 84);
             comboBox2.Name = "comboBox2";
-            comboBox2.Size = new Size(121, 23);
+            comboBox2.Size = new Size(139, 23);
             comboBox2.TabIndex = 12;
-            // 
-            // comboBox3
-            // 
-            comboBox3.FormattingEnabled = true;
-            comboBox3.Location = new Point(336, 415);
-            comboBox3.Name = "comboBox3";
-            comboBox3.Size = new Size(121, 23);
-            comboBox3.TabIndex = 13;
             // 
             // textBox3
             // 
-            textBox3.Location = new Point(28, 415);
+            textBox3.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            textBox3.Location = new Point(644, 133);
             textBox3.Name = "textBox3";
-            textBox3.Size = new Size(100, 23);
+            textBox3.Size = new Size(139, 23);
             textBox3.TabIndex = 14;
             // 
             // label4
             // 
+            label4.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             label4.AutoSize = true;
-            label4.Location = new Point(54, 397);
+            label4.Location = new Point(692, 115);
             label4.Name = "label4";
             label4.Size = new Size(44, 15);
             label4.TabIndex = 15;
             label4.Text = "Összeg";
             // 
-            // label5
-            // 
-            label5.AutoSize = true;
-            label5.Location = new Point(214, 398);
-            label5.Name = "label5";
-            label5.Size = new Size(25, 15);
-            label5.TabIndex = 16;
-            label5.Text = "-/+";
-            // 
             // label6
             // 
+            label6.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             label6.AutoSize = true;
-            label6.Location = new Point(366, 397);
+            label6.Location = new Point(676, 66);
             label6.Name = "label6";
             label6.Size = new Size(60, 15);
             label6.TabIndex = 17;
@@ -204,17 +185,25 @@
             trackBar2.TabIndex = 18;
             trackBar2.Scroll += trackBar2_Scroll;
             // 
+            // listBox1
+            // 
+            listBox1.FormattingEnabled = true;
+            listBox1.ItemHeight = 15;
+            listBox1.Location = new Point(1, 51);
+            listBox1.Name = "listBox1";
+            listBox1.Size = new Size(128, 334);
+            listBox1.TabIndex = 19;
+            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(800, 450);
+            ClientSize = new Size(795, 450);
+            Controls.Add(listBox1);
             Controls.Add(trackBar2);
             Controls.Add(label6);
-            Controls.Add(label5);
             Controls.Add(label4);
             Controls.Add(textBox3);
-            Controls.Add(comboBox3);
             Controls.Add(comboBox2);
             Controls.Add(button3);
             Controls.Add(dataGridView1);
@@ -222,7 +211,6 @@
             Controls.Add(button1);
             Controls.Add(textBox2);
             Controls.Add(textBox1);
-            Controls.Add(comboBox1);
             Controls.Add(trackBar1);
             Controls.Add(label3);
             Controls.Add(label2);
@@ -242,7 +230,6 @@
         private Label label2;
         private Label label3;
         private TrackBar trackBar1;
-        private ComboBox comboBox1;
         private TextBox textBox1;
         private TextBox textBox2;
         private Button button1;
@@ -250,11 +237,10 @@
         private DataGridView dataGridView1;
         private Button button3;
         private ComboBox comboBox2;
-        private ComboBox comboBox3;
         private TextBox textBox3;
         private Label label4;
-        private Label label5;
         private Label label6;
         private TrackBar trackBar2;
+        private ListBox listBox1;
     }
 }

@@ -16,6 +16,7 @@ namespace Hotcakespicemanager
         private static readonly HttpClient httpClient = new HttpClient();
         private List<Product> allProducts = new List<Product>();
         private List<Product> filteredProducts = new List<Product>();
+        private List<Category> allCategories = new List<Category>();
 
 
         public Form1()
@@ -93,6 +94,7 @@ namespace Hotcakespicemanager
 
                 dataGridView1.DataSource = null;
                 dataGridView1.DataSource = filteredProducts;
+                await LoadCategoriesAsync();
 
                 MessageBox.Show($"Betöltve: {filteredProducts.Count} termék");
             }
@@ -101,13 +103,7 @@ namespace Hotcakespicemanager
                 MessageBox.Show("Hiba történt:\n" + ex.Message);
             }
         }
-        private void FillCategoryComboBox()
-        {
-            comboBox1.DataSource = null;
-            comboBox1.Items.Clear();
-            comboBox1.Items.Add("Összes");
-            comboBox1.SelectedIndex = 0;
-        }
+       
 
         private void button2_Click(object sender, EventArgs e)
         {
@@ -172,10 +168,59 @@ namespace Hotcakespicemanager
             if (max.HasValue)
                 query = query.Where(p => p.SitePrice <= max.Value);
 
+            var selectedIds = listBox1.SelectedItems
+                .Cast<Category>()
+                .Select(c => c.RewriteUrl)
+                .ToList();
+
+            if (selectedIds.Any())
+            {
+                query = query.Where(p =>
+                    selectedIds.Any(cat =>
+                        (p.UrlSlug ?? "").ToLower().Contains(cat.ToLower())
+                    )
+                );
+            }
+
             filteredProducts = query.ToList();
 
             dataGridView1.DataSource = null;
             dataGridView1.DataSource = filteredProducts;
+        }
+
+        private async Task LoadCategoriesAsync()
+        {
+            try
+            {
+                var endpoint = $"categories?key={API_KEY}";
+                var response = await httpClient.GetAsync(endpoint);
+                var json = await response.Content.ReadAsStringAsync();
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    MessageBox.Show("Kategória hiba:\n" + json);
+                    return;
+                }
+
+                var result = JsonConvert.DeserializeObject<CategoryResponse>(json);
+
+                allCategories = result?.Content ?? new List<Category>();
+
+                FillCategoryListBox();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Hiba kategória betöltésnél:\n" + ex.Message);
+            }
+        }
+
+        private void FillCategoryListBox()
+        {
+            listBox1.DataSource = null;
+
+            listBox1.DataSource = allCategories;
+            listBox1.DisplayMember = "Name";   // amit látsz
+            listBox1.ValueMember = "Bvin";     // ID
         }
     }
 }
