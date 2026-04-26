@@ -101,7 +101,7 @@
             // button1
             // 
             button1.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            button1.Location = new Point(619, 12);
+            button1.Location = new Point(822, 12);
             button1.Name = "button1";
             button1.Size = new Size(75, 23);
             button1.TabIndex = 8;
@@ -112,7 +112,7 @@
             // button2
             // 
             button2.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            button2.Location = new Point(713, 12);
+            button2.Location = new Point(916, 12);
             button2.Name = "button2";
             button2.Size = new Size(75, 23);
             button2.TabIndex = 9;
@@ -124,16 +124,16 @@
             // 
             dataGridView1.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             dataGridView1.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            dataGridView1.Location = new Point(135, 51);
+            dataGridView1.Location = new Point(150, 51);
             dataGridView1.Name = "dataGridView1";
-            dataGridView1.Size = new Size(503, 332);
+            dataGridView1.Size = new Size(691, 422);
             dataGridView1.TabIndex = 10;
             dataGridView1.CellContentClick += dataGridView1_CellContentClick;
             // 
             // button3
             // 
             button3.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
-            button3.Location = new Point(713, 415);
+            button3.Location = new Point(916, 505);
             button3.Name = "button3";
             button3.Size = new Size(75, 23);
             button3.TabIndex = 11;
@@ -144,7 +144,7 @@
             // 
             comboBox2.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             comboBox2.FormattingEnabled = true;
-            comboBox2.Location = new Point(644, 84);
+            comboBox2.Location = new Point(847, 84);
             comboBox2.Name = "comboBox2";
             comboBox2.Size = new Size(139, 23);
             comboBox2.TabIndex = 12;
@@ -152,7 +152,7 @@
             // textBox3
             // 
             textBox3.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            textBox3.Location = new Point(644, 133);
+            textBox3.Location = new Point(847, 133);
             textBox3.Name = "textBox3";
             textBox3.Size = new Size(139, 23);
             textBox3.TabIndex = 14;
@@ -161,7 +161,7 @@
             // 
             label4.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             label4.AutoSize = true;
-            label4.Location = new Point(692, 115);
+            label4.Location = new Point(895, 115);
             label4.Name = "label4";
             label4.Size = new Size(44, 15);
             label4.TabIndex = 15;
@@ -171,7 +171,7 @@
             // 
             label6.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             label6.AutoSize = true;
-            label6.Location = new Point(676, 66);
+            label6.Location = new Point(879, 66);
             label6.Name = "label6";
             label6.Size = new Size(60, 15);
             label6.TabIndex = 17;
@@ -191,14 +191,15 @@
             listBox1.ItemHeight = 15;
             listBox1.Location = new Point(1, 51);
             listBox1.Name = "listBox1";
-            listBox1.Size = new Size(128, 334);
+            listBox1.Size = new Size(143, 334);
             listBox1.TabIndex = 19;
+            listBox1.SelectedIndexChanged += listBox1_SelectedIndexChanged;
             // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(795, 450);
+            ClientSize = new Size(998, 540);
             Controls.Add(listBox1);
             Controls.Add(trackBar2);
             Controls.Add(label6);

@@ -4,6 +4,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Newtonsoft.Json;
+using System.Linq;
 
 namespace Hotcakespicemanager
 {
@@ -24,6 +25,7 @@ namespace Hotcakespicemanager
             InitializeComponent();
             InitializeApi();
             InitializeGrid();
+            _ = LoadCategoriesAsync();
         }
         private void InitializeApi()
         {
@@ -36,10 +38,33 @@ namespace Hotcakespicemanager
         }
         private void InitializeGrid()
         {
-            dataGridView1.AutoGenerateColumns = true;
+            dataGridView1.AutoGenerateColumns = false;
             dataGridView1.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
             dataGridView1.MultiSelect = true;
             dataGridView1.ReadOnly = true;
+
+            dataGridView1.Columns.Clear();
+
+            dataGridView1.Columns.Add(new DataGridViewTextBoxColumn
+            {
+                DataPropertyName = "Sku",
+                HeaderText = "SKU",
+                Width = 120
+            });
+
+            dataGridView1.Columns.Add(new DataGridViewTextBoxColumn
+            {
+                DataPropertyName = "ProductName",
+                HeaderText = "Terméknév",
+                Width = 350
+            });
+
+            dataGridView1.Columns.Add(new DataGridViewTextBoxColumn
+            {
+                DataPropertyName = "SitePrice",
+                HeaderText = "Ár",
+                Width = 100
+            });
         }
 
         private void dataGridView1_CellContentClick(object sender, DataGridViewCellEventArgs e)
@@ -55,46 +80,29 @@ namespace Hotcakespicemanager
         {
             try
             {
-                var endpoint = $"products?key={API_KEY}";
-                var response = await httpClient.GetAsync(endpoint);
-                var json = await response.Content.ReadAsStringAsync();
-
-                if (!response.IsSuccessStatusCode)
-                {
-                    MessageBox.Show($"Hiba a lekéréskor: {response.StatusCode}\n\n{json}");
-                    return;
-                }
-
-                var result = JsonConvert.DeserializeObject<ProductListResponse>(json);
-
-                allProducts = result?.Content?.Products ?? new List<Product>();
-                filteredProducts = allProducts.ToList();
+                allProducts = await LoadAllProductsFast();
+                ApplyFilter();
 
                 if (allProducts.Any())
                 {
                     maxSitePrice = allProducts.Max(p => p.SitePrice);
+
                     trackBar2.Minimum = 0;
                     trackBar2.Maximum = 1000;
                     trackBar2.Value = 0;
-                    trackBar2.TickFrequency = 50;
-                    trackBar2.SmallChange = 1;
-                    trackBar2.LargeChange = 25;
 
                     trackBar1.Minimum = 0;
                     trackBar1.Maximum = 1000;
                     trackBar1.Value = 1000;
-                    trackBar1.TickFrequency = 50;
-                    trackBar1.SmallChange = 1;
-                    trackBar1.LargeChange = 25;
 
                     textBox1.Text = "0";
                     textBox2.Text = Math.Round(maxSitePrice, 0).ToString();
                 }
-
-
-                dataGridView1.DataSource = null;
-                dataGridView1.DataSource = filteredProducts;
-                await LoadCategoriesAsync();
+                else
+                {
+                    textBox1.Text = "0";
+                    textBox2.Text = "0";
+                }
 
                 MessageBox.Show($"Betöltve: {filteredProducts.Count} termék");
             }
@@ -103,31 +111,11 @@ namespace Hotcakespicemanager
                 MessageBox.Show("Hiba történt:\n" + ex.Message);
             }
         }
-       
+
 
         private void button2_Click(object sender, EventArgs e)
         {
-            decimal? min = null;
-            decimal? max = null;
-
-            if (decimal.TryParse(textBox1.Text, out decimal minVal))
-                min = minVal;
-
-            if (decimal.TryParse(textBox2.Text, out decimal maxVal))
-                max = maxVal;
-
-            var query = allProducts.AsEnumerable();
-
-            if (min.HasValue)
-                query = query.Where(p => p.SitePrice >= min.Value);
-
-            if (max.HasValue)
-                query = query.Where(p => p.SitePrice <= max.Value);
-
-            filteredProducts = query.ToList();
-
-            dataGridView1.DataSource = null;
-            dataGridView1.DataSource = filteredProducts;
+            
             ApplyFilter();
         }
 
@@ -161,6 +149,7 @@ namespace Hotcakespicemanager
                 max = maxVal;
 
             IEnumerable<Product> query = allProducts;
+            query = query.Where(p => p.StoreId == 1);
 
             if (min.HasValue)
                 query = query.Where(p => p.SitePrice >= min.Value);
@@ -168,17 +157,13 @@ namespace Hotcakespicemanager
             if (max.HasValue)
                 query = query.Where(p => p.SitePrice <= max.Value);
 
-            var selectedIds = listBox1.SelectedItems
-                .Cast<Category>()
-                .Select(c => c.RewriteUrl)
-                .ToList();
+            string selectedPrefix = GetSelectedSkuPrefix();
 
-            if (selectedIds.Any())
+            if (!string.IsNullOrEmpty(selectedPrefix))
             {
                 query = query.Where(p =>
-                    selectedIds.Any(cat =>
-                        (p.UrlSlug ?? "").ToLower().Contains(cat.ToLower())
-                    )
+                    !string.IsNullOrEmpty(p.Sku) &&
+                    p.Sku.StartsWith(selectedPrefix)
                 );
             }
 
@@ -218,9 +203,127 @@ namespace Hotcakespicemanager
         {
             listBox1.DataSource = null;
 
-            listBox1.DataSource = allCategories;
-            listBox1.DisplayMember = "Name";   // amit látsz
-            listBox1.ValueMember = "Bvin";     // ID
+            var displayCategories = new List<Category>();
+
+            displayCategories.Add(new Category
+            {
+                Bvin = "ALL",
+                Name = "Minden termék",
+                RewriteUrl = "all"
+            });
+
+            var uniqueCategories = allCategories
+                .Where(c => !((c.Name ?? "").ToLower().Contains("szervíz")))
+                .GroupBy(c => c.Name)
+                .Select(g => g.First())
+                .OrderBy(c => c.Name)
+                .ToList();
+
+            displayCategories.AddRange(uniqueCategories);
+
+            listBox1.DisplayMember = "Name";
+            listBox1.ValueMember = "Bvin";
+            listBox1.DataSource = displayCategories;
+
+            listBox1.SelectedIndex = 0;
+        }
+        private async Task<List<Product>> LoadAllProductsFast(string categoryId = null)
+        {
+            string endpoint = $"products?key={API_KEY}";
+
+            var response = await httpClient.GetAsync(endpoint);
+            var json = await response.Content.ReadAsStringAsync();
+
+            if (!response.IsSuccessStatusCode)
+            {
+                MessageBox.Show($"API hiba: {response.StatusCode}\n\n{json}");
+                return new List<Product>();
+            }
+
+            var result = JsonConvert.DeserializeObject<ProductListResponse>(json);
+
+            return result?.Content?.Products ?? new List<Product>();
+        }
+
+        private void listBox1_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            ApplyFilter();
+        }
+
+        private string GetSelectedSkuPrefix()
+        {
+            if (listBox1.SelectedItem is not Category selectedCategory)
+                return null;
+
+            if (selectedCategory.Bvin == "ALL")
+                return null;
+
+            string name = selectedCategory.Name.ToLower();
+
+            if (name.Contains("elektromos eszköz") || name.Contains("elektromos eszkoz"))
+                return "ID 1";
+
+            if (name.Contains("kiegészítő") || name.Contains("kiegeszito"))
+                return "ID 2";
+
+            if (name.Contains("alkatrész") || name.Contains("alkatresz"))
+                return "ID 3";
+
+            if (name.Contains("ruhak") || name.Contains("ruhák"))
+                return "ID 4";
+
+            if (name.Contains("kerékpár") || name.Contains("kerekpar"))
+                return "ID 11";
+
+            if (name.Contains("roller"))
+                return "ID 12";
+
+            if (name.Contains("gördeszkák") || name.Contains("gordeszkak"))
+                return "ID 13";
+
+            if (name.Contains("hoverboard"))
+                return "ID 14";
+
+            if (name.Contains("csengő") || name.Contains("csengo"))
+                return "ID 21";
+
+            if (name.Contains("lámpa") || name.Contains("lampa"))
+                return "ID 22";
+
+            if (name.Contains("hordozó") || name.Contains("hordozo"))
+                return "ID 23";
+
+            if (name.Contains("gumi"))
+                return "ID 31";
+
+            if (name.Contains("kerék") || name.Contains("kerek"))
+                return "ID 32";
+
+            if (name.Contains("fék") || name.Contains("fek"))
+                return "ID 33";
+
+            if (name.Contains("nyereg"))
+                return "ID 34";
+
+            if (name.Contains("akku") || name.Contains("akkumulátor"))
+                return "ID 35";
+
+            if (name.Contains("kesztyű") || name.Contains("kesztyu"))
+                return "ID 41";
+
+            if (name.Contains("mez"))
+                return "ID 42";
+
+            if (name.Contains("sisak"))
+                return "ID 43";
+
+            if (name.Contains("szemüveg") || name.Contains("szemuveg"))
+                return "ID 44";
+
+            if (name.Contains("cipő") || name.Contains("cipo"))
+                return "ID 45";
+
+            return null;
         }
     }
 }
