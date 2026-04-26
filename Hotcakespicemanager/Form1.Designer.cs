@@ -45,6 +45,7 @@
             trackBar2 = new TrackBar();
             listBox1 = new ListBox();
             checkBox1 = new CheckBox();
+            checkBox2 = new CheckBox();
             ((System.ComponentModel.ISupportInitialize)trackBar1).BeginInit();
             ((System.ComponentModel.ISupportInitialize)dataGridView1).BeginInit();
             ((System.ComponentModel.ISupportInitialize)trackBar2).BeginInit();
@@ -102,7 +103,7 @@
             // button1
             // 
             button1.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            button1.Location = new Point(822, 12);
+            button1.Location = new Point(824, 12);
             button1.Name = "button1";
             button1.Size = new Size(75, 23);
             button1.TabIndex = 8;
@@ -113,7 +114,7 @@
             // button2
             // 
             button2.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            button2.Location = new Point(916, 12);
+            button2.Location = new Point(918, 12);
             button2.Name = "button2";
             button2.Size = new Size(75, 23);
             button2.TabIndex = 9;
@@ -134,18 +135,19 @@
             // button3
             // 
             button3.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
-            button3.Location = new Point(916, 505);
+            button3.Location = new Point(918, 505);
             button3.Name = "button3";
             button3.Size = new Size(75, 23);
             button3.TabIndex = 11;
             button3.Text = "Alkalmaz";
             button3.UseVisualStyleBackColor = true;
+            button3.Click += button3_Click_1;
             // 
             // comboBox2
             // 
             comboBox2.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             comboBox2.FormattingEnabled = true;
-            comboBox2.Location = new Point(847, 84);
+            comboBox2.Location = new Point(849, 84);
             comboBox2.Name = "comboBox2";
             comboBox2.Size = new Size(139, 23);
             comboBox2.TabIndex = 12;
@@ -153,7 +155,7 @@
             // textBox3
             // 
             textBox3.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            textBox3.Location = new Point(847, 133);
+            textBox3.Location = new Point(849, 133);
             textBox3.Name = "textBox3";
             textBox3.Size = new Size(139, 23);
             textBox3.TabIndex = 14;
@@ -162,7 +164,7 @@
             // 
             label4.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             label4.AutoSize = true;
-            label4.Location = new Point(895, 115);
+            label4.Location = new Point(897, 115);
             label4.Name = "label4";
             label4.Size = new Size(44, 15);
             label4.TabIndex = 15;
@@ -172,7 +174,7 @@
             // 
             label6.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             label6.AutoSize = true;
-            label6.Location = new Point(879, 66);
+            label6.Location = new Point(881, 66);
             label6.Name = "label6";
             label6.Size = new Size(60, 15);
             label6.TabIndex = 17;
@@ -206,11 +208,22 @@
             checkBox1.Text = "1000-re kerekítés";
             checkBox1.UseVisualStyleBackColor = true;
             // 
+            // checkBox2
+            // 
+            checkBox2.AutoSize = true;
+            checkBox2.Location = new Point(847, 199);
+            checkBox2.Name = "checkBox2";
+            checkBox2.Size = new Size(138, 19);
+            checkBox2.TabIndex = 21;
+            checkBox2.Text = "minden szűrt termék ";
+            checkBox2.UseVisualStyleBackColor = true;
+            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(998, 540);
+            ClientSize = new Size(1000, 540);
+            Controls.Add(checkBox2);
             Controls.Add(checkBox1);
             Controls.Add(listBox1);
             Controls.Add(trackBar2);
@@ -256,5 +269,6 @@
         private TrackBar trackBar2;
         private ListBox listBox1;
         private CheckBox checkBox1;
+        private CheckBox checkBox2;
     }
 }

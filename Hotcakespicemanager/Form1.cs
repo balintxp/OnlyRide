@@ -1,10 +1,11 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using Newtonsoft.Json;
-using System.Linq;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
 namespace Hotcakespicemanager
 {
@@ -25,6 +26,12 @@ namespace Hotcakespicemanager
             InitializeComponent();
             InitializeApi();
             InitializeGrid();
+
+            comboBox2.Items.Clear();
+            comboBox2.Items.Add("%");
+            comboBox2.Items.Add("normál");
+            comboBox2.SelectedIndex = 0;
+
             _ = LoadCategoriesAsync();
         }
         private void InitializeApi()
@@ -63,6 +70,13 @@ namespace Hotcakespicemanager
             {
                 DataPropertyName = "SitePrice",
                 HeaderText = "Ár",
+                Width = 100
+            });
+
+            dataGridView1.Columns.Add(new DataGridViewTextBoxColumn
+            {
+                DataPropertyName = "NewPrice",
+                HeaderText = "Új ár",
                 Width = 100
             });
         }
@@ -359,6 +373,59 @@ namespace Hotcakespicemanager
             return 999;
         }
 
+        private void button3_Click_1(object sender, EventArgs e)
+        {
+            if (!decimal.TryParse(textBox3.Text, out decimal value))
+            {
+                MessageBox.Show("Adj meg egy érvényes számot az összeg mezőbe!");
+                return;
+            }
 
+            List<Product> productsToModify;
+
+            if (checkBox2.Checked)
+            {
+                productsToModify = filteredProducts;
+            }
+            else
+            {
+                productsToModify = dataGridView1.SelectedRows
+                    .Cast<DataGridViewRow>()
+                    .Select(r => r.DataBoundItem as Product)
+                    .Where(p => p != null)
+                    .ToList();
+            }
+
+            if (!productsToModify.Any())
+            {
+                MessageBox.Show("Nincs kiválasztott termék!");
+                return;
+            }
+
+            foreach (var product in productsToModify)
+            {
+                decimal newPrice;
+
+                if (comboBox2.SelectedItem?.ToString() == "%")
+                {
+                    newPrice = product.SitePrice * (1 + value / 100);
+                }
+                else
+                {
+                    newPrice = product.SitePrice + value;
+                }
+
+                if (checkBox1.Checked)
+                {
+                    newPrice = Math.Round(newPrice / 1000m, 0) * 1000m;
+                }
+
+                product.NewPrice = newPrice;
+            }
+
+            dataGridView1.Refresh();
+
+            MessageBox.Show($"{productsToModify.Count} termék új ára kiszámolva.");
+        }
     }
 }
