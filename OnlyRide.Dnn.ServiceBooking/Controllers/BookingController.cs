@@ -75,6 +75,22 @@ namespace OnlyRide.Dnn.ServiceBooking.Controllers
             }
             try
             {
+                // Admin lezárás - ha van "AdminAction" hidden mező a formban
+                if (Request.Form["AdminAction"] == "complete")
+                {
+                    var existing = ServiceBookingManager.Instance.GetBooking(booking.BookingId, ModuleContext.ModuleId);
+                    if (existing != null && (User.IsSuperUser || ModuleContext.IsEditable))
+                    {
+                        existing.Status = Request.Form["Status"];
+                        if (int.TryParse(Request.Form["ActualMinutes"], out int minutes))
+                            existing.ActualMinutes = minutes;
+                        if (decimal.TryParse(Request.Form["ActualPrice"], out decimal price))
+                            existing.ActualPrice = price;
+                        ServiceBookingManager.Instance.UpdateBooking(existing);
+                    }
+                    return Redirect(Globals.NavigateURL(PortalSettings.ActiveTab.TabID));
+                }
+
                 if (booking.BookingId <= 0)
                 {
                     // Új foglalás létrehozása
@@ -123,28 +139,6 @@ namespace OnlyRide.Dnn.ServiceBooking.Controllers
                             ServiceBookingManager.Instance.UpdateVehicle(existingVehicle);
                         }
                     }
-                }
-                return Redirect(Globals.NavigateURL(PortalSettings.ActiveTab.TabID));
-            }
-            catch (Exception ex)
-            {
-                return Content("MENTÉSI HIBA TÖRTÉNT: " + ex.Message);
-            }
-        }
-
-        // Admin szerviz lezárás - ActualMinutes, ActualPrice és státusz frissítése
-        [HttpPost]
-        public ActionResult AdminComplete(Booking booking)
-        {
-            try
-            {
-                var existing = ServiceBookingManager.Instance.GetBooking(booking.BookingId, ModuleContext.ModuleId);
-                if (existing != null && (User.IsSuperUser || ModuleContext.IsEditable))
-                {
-                    existing.Status = booking.Status;
-                    existing.ActualMinutes = booking.ActualMinutes;
-                    existing.ActualPrice = booking.ActualPrice;
-                    ServiceBookingManager.Instance.UpdateBooking(existing);
                 }
                 return Redirect(Globals.NavigateURL(PortalSettings.ActiveTab.TabID));
             }

@@ -69,10 +69,11 @@
         </div>
 
         @* Admin szerkeszthető mezők - szerviz lezáráshoz *@
-        <form action="@Url.Action("AdminComplete", "Booking")?mid=@Dnn.ModuleContext.ModuleId&tabid=@Dnn.PortalSettings.ActiveTab.TabID" method="post">
+        <form action="@Url.Action("Edit", "Booking", new { mid = Dnn.ModuleContext.ModuleId, tabid = Dnn.PortalSettings.ActiveTab.TabID })" method="post">
             @Html.AntiForgeryToken()
             <input type="hidden" name="mid" value="@Dnn.ModuleContext.ModuleId" />
             <input type="hidden" name="BookingId" value="@Model.BookingId" />
+            <input type="hidden" name="AdminAction" value="complete" />
 
             <h3>Szerviz lezárása</h3>
 

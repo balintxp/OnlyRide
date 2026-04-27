@@ -36,6 +36,7 @@
             <span class="legend-item"><span class="dot foglalt"></span> Foglalt</span>
             <span class="legend-item"><span class="dot sajat"></span> Saját</span>
             <span class="legend-item"><span class="dot kesz"></span> Kész</span>
+            <span class="legend-item"><span class="dot folyamatban"></span> Folyamatban</span>
         </div>
     </div>
 
@@ -67,15 +68,14 @@
                     b.Status != "Lemondva");
 
                 // Múltbeli időpont ellenőrzése
-                bool isPast = currentSlotDate < DateTime.Now;
+                bool isPast = currentSlotDate < DateTime.Now.AddHours(-2);
 
                 string statusClass = "status-szabad";
                 string statusText = "Szabad";
                 string actionUrl = "#";
 
-                if (isPast && booking == null)
+                if (isPast)
                 {
-                    // Múltbeli szabad időpont - szürke, nem kattintható
                     statusClass = "status-lejart";
                     statusText = "";
                 }
@@ -88,7 +88,7 @@
                     if (booking.Status == "Kész")
                     {
                         statusClass = "status-kesz";
-                        statusText = isAdmin ? "Kész (admin)" : "Kész";
+                        statusText = "Kész";
                         actionUrl = isAdmin ? string.Format("{0}?bookingId={1}&mid={2}",
                             Url.Action("Edit", "Booking"), booking.BookingId, Dnn.ModuleContext.ModuleId) : "#";
                     }
@@ -96,7 +96,7 @@
                     else if (booking.Status == "Folyamatban")
                     {
                         statusClass = "status-folyamatban";
-                        statusText = isAdmin ? "Folyamatban (admin)" : (isMine ? "Saját" : "Foglalt");
+                        statusText = "Folyamatban";
                         actionUrl = (isMine || isAdmin) ? string.Format("{0}?bookingId={1}&mid={2}",
                             Url.Action("Edit", "Booking"), booking.BookingId, Dnn.ModuleContext.ModuleId) : "#";
                     }
@@ -104,7 +104,7 @@
                     else
                     {
                         statusClass = isMine ? "status-sajat" : "status-foglalt";
-                        statusText = isMine ? "Saját" : (isAdmin ? "Foglalt (admin)" : "Foglalt");
+                        statusText = isMine ? "Saját" : (isAdmin ? "Foglalt" : "Foglalt");
                         actionUrl = (isMine || isAdmin) ? string.Format("{0}?bookingId={1}&mid={2}",
                             Url.Action("Edit", "Booking"), booking.BookingId, Dnn.ModuleContext.ModuleId) : "#";
                     }

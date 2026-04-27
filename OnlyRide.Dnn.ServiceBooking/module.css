@@ -89,8 +89,8 @@
 /* Kész szerviz - fuchsia */
 .onlyride-calendar .status-kesz {
     background-color: #fdf0ff !important;
-    color: #c0157a !important;
-    border-color: #c0157a !important;
+    color: fuchsia !important;
+    border-color: fuchsia !important;
 }
 
 /* NAPTÁR - Jelmagyarázat */
@@ -141,7 +141,7 @@
     }
 
     .dot.kesz {
-        background-color: #c0157a;
+        background-color: fuchsia;
     }
 
     .dot.lejart {
