@@ -93,6 +93,13 @@ namespace OnlyRide.Dnn.ServiceBooking.Controllers
 
                 if (booking.BookingId <= 0)
                 {
+                    // Form értékek kimentése változókba
+                    string vehicleType = Request.Form["VehicleType"];
+                    string brand = Request.Form["Brand"];
+                    string vehicleModel = Request.Form["VehicleModel"];
+                    string serialNumber = Request.Form["SerialNumber"];
+                    string vehicleNotes = Request.Form["VehicleNotes"];
+
                     // Új foglalás létrehozása
                     booking.UserId = User.UserID;
                     booking.ModuleId = ModuleContext.ModuleId;
@@ -102,20 +109,64 @@ namespace OnlyRide.Dnn.ServiceBooking.Controllers
                     booking.Status = "Függőben";
                     ServiceBookingManager.Instance.CreateBooking(booking);
 
-                    // Jármű adatok mentése az új foglaláshoz
-                    if (booking.BookingId > 0 && !string.IsNullOrEmpty(Request.Form["VehicleType"]))
+                    // Jármű adatok mentése
+                    if (booking.BookingId > 0 && !string.IsNullOrEmpty(vehicleType))
                     {
                         var vehicle = new Vehicle
                         {
                             BookingId = booking.BookingId,
-                            VehicleType = Request.Form["VehicleType"],
-                            Brand = Request.Form["Brand"],
-                            Model = Request.Form["VehicleModel"],
-                            SerialNumber = Request.Form["SerialNumber"],
-                            Notes = Request.Form["VehicleNotes"]
+                            VehicleType = vehicleType,
+                            Brand = brand,
+                            Model = vehicleModel,
+                            SerialNumber = serialNumber,
+                            Notes = vehicleNotes
                         };
                         ServiceBookingManager.Instance.CreateVehicle(vehicle);
                     }
+
+                    // Email küldése
+                    var serviceTypes = ServiceBookingManager.Instance.GetServiceTypes(0);
+                    var selectedService = serviceTypes.FirstOrDefault(s => s.ServiceTypeId == booking.ServiceTypeId);
+
+                    string emailBody = string.Format(
+                        "Kedves {0}!<br><br>" +
+                        "Sikeresen foglalt időpontot az OnlyRide szervizbe.<br><br>" +
+                        "<b>Foglalás adatai:</b><br>" +
+                        "Időpont: {1}<br>" +
+                        "Szolgáltatás: {2}<br>" +
+                        "Becsült ár: {3} Ft<br>" +
+                        "Becsült idő: {4} perc<br><br>" +
+                        "Jármű adatai:<br>" +
+                        "Típus: {5}<br>" +
+                        "Márka / Modell: {6} {7}<br>" +
+                        "Sorozatszám: {8}<br><br>" +
+                        "Hiba leírása: {9}<br><br>" +
+                        "Üdvözlettel,<br>OnlyRide Szerviz",
+                        User.DisplayName,
+                        booking.CreatedOnDate.ToString("yyyy. MM. dd. HH:mm"),
+                        selectedService != null ? selectedService.Name : "-",
+                        selectedService != null ? selectedService.BasePrice.ToString() : "-",
+                        selectedService != null ? selectedService.EstimatedMinutes.ToString() : "-",
+                        vehicleType,
+                        brand,
+                        vehicleModel,
+                        serialNumber,
+                        booking.CustomNote ?? "-"
+                    );
+
+                    DotNetNuke.Services.Mail.Mail.SendMail(
+                        PortalSettings.Email,
+                        User.Email,
+                        "",
+                        "OnlyRide – Foglalás visszaigazolása",
+                        emailBody,
+                        "",
+                        "HTML",
+                        "",
+                        "",
+                        "",
+                        ""
+                    );
                 }
                 else
                 {
@@ -144,7 +195,7 @@ namespace OnlyRide.Dnn.ServiceBooking.Controllers
             }
             catch (Exception ex)
             {
-                return Content("MENTÉSI HIBA TÖRTÉNT: " + ex.Message);
+                return Content("MENTÉSI HIBA TÖRTÉNT: " + ex.Message + " | " + ex.StackTrace);
             }
         }
 
