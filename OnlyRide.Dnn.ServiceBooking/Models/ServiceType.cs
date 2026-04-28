@@ -6,6 +6,7 @@ namespace OnlyRide.Dnn.ServiceBooking.Models
     [TableName("OnlyRide_ServiceTypes")]
     [PrimaryKey("ServiceTypeId", AutoIncrement = true)]
     [Cacheable("OnlyRide_ServiceTypes", CacheItemPriority.Default, 20)]
+    [Scope("ModuleId")]
     public class ServiceType
     {
         public int ServiceTypeId { get; set; }
@@ -15,5 +16,6 @@ namespace OnlyRide.Dnn.ServiceBooking.Models
         public decimal BasePrice { get; set; }
         public bool IsActive { get; set; } = true;
         public int ModuleId { get; set; }
+        public string HotcakesBvin { get; set; }
     }
 }

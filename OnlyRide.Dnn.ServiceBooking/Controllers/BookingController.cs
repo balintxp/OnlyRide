@@ -8,6 +8,8 @@ using OnlyRide.Dnn.ServiceBooking.Models;
 using System;
 using System.Linq;
 using System.Web.Mvc;
+using Hotcakes.Commerce;
+using Hotcakes.Commerce.Orders;
 
 namespace OnlyRide.Dnn.ServiceBooking.Controllers
 {
@@ -75,38 +77,164 @@ namespace OnlyRide.Dnn.ServiceBooking.Controllers
             }
             try
             {
-                // Admin lezárás - ha van "AdminAction" hidden mező a formban
-                if (Request.Form["AdminAction"] == "complete")
+                // 1. ADMIN LEZÁRÁS (Ha a rejtett mező "true")
+                if (Request.Form["IsAdminForm"] == "true" && (User.IsSuperUser || ModuleContext.IsEditable))
                 {
+                    // ITT TÖLTJÜK BE AZ 'existing' VÁLTOZÓT AZ ADATBÁZISBÓL!
                     var existing = ServiceBookingManager.Instance.GetBooking(booking.BookingId, ModuleContext.ModuleId);
-                    if (existing != null && (User.IsSuperUser || ModuleContext.IsEditable))
+
+                    if (existing != null)
                     {
-                        existing.Status = Request.Form["Status"];
-                        if (int.TryParse(Request.Form["ActualMinutes"], out int minutes))
-                            existing.ActualMinutes = minutes;
-                        if (decimal.TryParse(Request.Form["ActualPrice"], out decimal price))
-                            existing.ActualPrice = price;
+                        existing.Status = booking.Status;
+
+                        // Fallback logika az időre
+                        if (booking.ActualMinutes.HasValue)
+                        {
+                            existing.ActualMinutes = booking.ActualMinutes;
+                        }
+                        else
+                        {
+                            var st = ServiceBookingManager.Instance.GetServiceType(existing.ServiceTypeId, ModuleContext.ModuleId);
+                            if (st != null) existing.ActualMinutes = st.EstimatedMinutes;
+                        }
+
+                        // Fallback logika az árra
+                        if (booking.ActualPrice.HasValue)
+                        {
+                            existing.ActualPrice = booking.ActualPrice;
+                        }
+                        else
+                        {
+                            var st = ServiceBookingManager.Instance.GetServiceType(existing.ServiceTypeId, ModuleContext.ModuleId);
+                            if (st != null) existing.ActualPrice = st.BasePrice;
+                        }
+
+                        // Elmentjük a DNN adatbázisba a lezárást
                         ServiceBookingManager.Instance.UpdateBooking(existing);
+
+                        // Debug naplózás, hogy lásd, mi van benne pontosan
+                        DotNetNuke.Services.Exceptions.Exceptions.LogException(new Exception("DEBUG - Status: [" + existing.Status + "], Price: " + existing.ActualPrice));
+
+                        // Robusztusabb ellenőrzés
+                        bool isDone = string.Equals(existing.Status?.Trim(), "Kész", StringComparison.OrdinalIgnoreCase)
+                                   || string.Equals(existing.Status?.Trim(), "Kesz", StringComparison.OrdinalIgnoreCase);
+
+                        // HOTCAKES RENDELÉS LÉTREHOZÁSA
+                        if (existing.Status != null && existing.Status.Trim().Equals("Kész", StringComparison.OrdinalIgnoreCase) && existing.ActualPrice.HasValue)
+                        {
+                            try
+                            {
+                                var serviceType = ServiceBookingManager.Instance.GetServiceType(existing.ServiceTypeId, ModuleContext.ModuleId);
+                                var dnnUser = DotNetNuke.Entities.Users.UserController.GetUserById(PortalSettings.PortalId, existing.UserId);
+
+                                string userEmail = dnnUser?.Email ?? "ismeretlen@onlyride.hu";
+                                string firstName = dnnUser?.FirstName ?? "OnlyRide";
+                                string lastName = dnnUser?.LastName ?? "Ügyfél";
+
+                                // Hotcakes alkalmazás inicializálása
+                                var hccApp = Hotcakes.Commerce.HotcakesApplication.Current;
+
+                                // Debug: null-e?
+                                DotNetNuke.Services.Exceptions.Exceptions.LogException(
+                                    new Exception("hccApp null-e: " + (hccApp == null ? "IGEN - NULL!" : "Nem null, OK")));
+
+                                if (hccApp == null)
+                                {
+                                    DotNetNuke.Services.Exceptions.Exceptions.LogException(
+                                        new Exception("Hotcakes Current null - nem lehet rendelést létrehozni"));
+                                    // Fallback: REST API-val próbálkozunk
+                                }
+                                else
+                                {
+                                    // ... a rendelés létrehozó kód
+                                    // Új rendelés létrehozása
+                                    var order = new Hotcakes.Commerce.Orders.Order();
+                                    order.UserEmail = userEmail;
+                                    order.BillingAddress.FirstName = firstName;
+                                    order.BillingAddress.LastName = lastName;
+                                    order.BillingAddress.Line1 = "-";
+                                    order.BillingAddress.City = "Budapest";
+                                    order.BillingAddress.PostalCode = "1000";
+                                    // CountryBvin-t NE add meg - hagyd üresen, a Hotcakes maga tölti fel
+
+                                    order.ShippingAddress.FirstName = firstName;
+                                    order.ShippingAddress.LastName = lastName;
+                                    order.ShippingAddress.Line1 = "-";
+                                    order.ShippingAddress.City = "Budapest";
+                                    order.ShippingAddress.PostalCode = "1000";
+
+                                    // Tétel hozzáadása
+                                    var lineItem = new Hotcakes.Commerce.Orders.LineItem();
+                                    lineItem.ProductName = serviceType?.Name ?? "Szerviz";
+                                    lineItem.ProductSku = "SZERVIZ-" + existing.ServiceTypeId;
+                                    lineItem.BasePricePerItem = existing.ActualPrice.Value;
+                                    lineItem.AdjustedPricePerItem = existing.ActualPrice.Value;
+                                    lineItem.LineTotal = existing.ActualPrice.Value;
+                                    lineItem.Quantity = 1;
+                                    order.Items.Add(lineItem);
+
+                                    hccApp.OrderServices.Orders.Create(order);
+
+                                    long orderNumber = hccApp.OrderServices.GenerateNewOrderNumber(hccApp.CurrentStore.Id);
+                                    order.OrderNumber = orderNumber.ToString();
+
+                                    // Státusz beállítása Received-re (ne legyen Cancelled)
+                                    order.StatusCode = Hotcakes.Commerce.Orders.OrderStatusCode.Received;
+                                    order.StatusName = "Received";
+
+                                    hccApp.OrderServices.Orders.Update(order);
+
+                                    // Email küldése az ügyfélnek DNN-en keresztül
+                                    DotNetNuke.Services.Mail.Mail.SendMail(
+                                        PortalSettings.Email,
+                                        userEmail,
+                                        "",
+                                        "OnlyRide – Szerviz elkészült | Rendelésszám: #" + order.OrderNumber,
+                                        string.Format(
+                                            "Kedves {0}!<br><br>" +
+                                            "A szervizünkben elvégzett munkálatok befejeződtek.<br><br>" +
+                                            "<b>Rendelés adatai:</b><br>" +
+                                            "Rendelésszám: #{1}<br>" +
+                                            "Szolgáltatás: {2}<br>" +
+                                            "Fizetendő összeg: {3} Ft<br><br>" +
+                                            "Kérjük, jöjjön el a járműért és fizesse ki a szerviz díját.<br><br>" +
+                                            "Üdvözlettel,<br>OnlyRide Szerviz",
+                                            firstName,
+                                            order.OrderNumber,
+                                            serviceType?.Name ?? "-",
+                                            existing.ActualPrice?.ToString() ?? "-"
+                                        ),
+                                        "", "HTML", "", "", "", ""
+                                    );
+                                }
+
+                                
+                            }
+                            catch (Exception ex)
+                            {
+                                DotNetNuke.Services.Exceptions.Exceptions.LogException(ex);
+                            }
+                        }
                     }
-                    return Redirect(Globals.NavigateURL(PortalSettings.ActiveTab.TabID));
+                        return Redirect(Globals.NavigateURL(PortalSettings.ActiveTab.TabID));
                 }
 
+                // 2. NORMÁL USER: Új foglalás leadása
                 if (booking.BookingId <= 0)
                 {
-                    // Form értékek kimentése változókba
                     string vehicleType = Request.Form["VehicleType"];
                     string brand = Request.Form["Brand"];
                     string vehicleModel = Request.Form["VehicleModel"];
                     string serialNumber = Request.Form["SerialNumber"];
                     string vehicleNotes = Request.Form["VehicleNotes"];
 
-                    // Új foglalás létrehozása
                     booking.UserId = User.UserID;
                     booking.ModuleId = ModuleContext.ModuleId;
                     booking.SlotId = booking.SlotId > 0 ? booking.SlotId : 0;
                     booking.ServiceTypeId = booking.ServiceTypeId > 0 ? booking.ServiceTypeId : 1;
                     booking.EstimatedPrice = 0;
                     booking.Status = "Függőben";
+
                     ServiceBookingManager.Instance.CreateBooking(booking);
 
                     // Jármű adatok mentése
@@ -124,8 +252,8 @@ namespace OnlyRide.Dnn.ServiceBooking.Controllers
                         ServiceBookingManager.Instance.CreateVehicle(vehicle);
                     }
 
-                    // Email küldése
-                    var serviceTypes = ServiceBookingManager.Instance.GetServiceTypes(0);
+                    // DNN Email küldése a foglalásról
+                    var serviceTypes = ServiceBookingManager.Instance.GetServiceTypes(ModuleContext.ModuleId);
                     var selectedService = serviceTypes.FirstOrDefault(s => s.ServiceTypeId == booking.ServiceTypeId);
 
                     string emailBody = string.Format(
@@ -168,17 +296,16 @@ namespace OnlyRide.Dnn.ServiceBooking.Controllers
                         ""
                     );
                 }
+                // 3. NORMÁL USER: Meglévő foglalásának szerkesztése
                 else
                 {
-                    // Meglévő foglalás frissítése
-                    var existing = ServiceBookingManager.Instance.GetBooking(booking.BookingId, ModuleContext.ModuleId);
-                    if (existing != null)
+                    var existingUserBooking = ServiceBookingManager.Instance.GetBooking(booking.BookingId, ModuleContext.ModuleId);
+                    if (existingUserBooking != null)
                     {
-                        existing.ServiceTypeId = booking.ServiceTypeId;
-                        existing.CustomNote = booking.CustomNote;
-                        ServiceBookingManager.Instance.UpdateBooking(existing);
+                        existingUserBooking.ServiceTypeId = booking.ServiceTypeId;
+                        existingUserBooking.CustomNote = booking.CustomNote;
+                        ServiceBookingManager.Instance.UpdateBooking(existingUserBooking);
 
-                        // Jármű adatok frissítése
                         var existingVehicle = ServiceBookingManager.Instance.GetVehicleByBooking(booking.BookingId);
                         if (existingVehicle != null && !string.IsNullOrEmpty(Request.Form["VehicleType"]))
                         {

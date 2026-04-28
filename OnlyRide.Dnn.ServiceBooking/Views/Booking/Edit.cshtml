@@ -1,6 +1,7 @@
 ﻿@inherits DotNetNuke.Web.Mvc.Framework.DnnWebViewPage<OnlyRide.Dnn.ServiceBooking.Models.Booking>
 @using DotNetNuke.Web.Mvc.Helpers
 
+
 @{
     // Változók előkészítése
     bool isAdmin = Dnn.User.IsSuperUser || Dnn.ModuleContext.IsEditable;
@@ -73,7 +74,7 @@
             @Html.AntiForgeryToken()
             <input type="hidden" name="mid" value="@Dnn.ModuleContext.ModuleId" />
             <input type="hidden" name="BookingId" value="@Model.BookingId" />
-            <input type="hidden" name="AdminAction" value="complete" />
+            <input type="hidden" name="IsAdminForm" value="true" />
 
             <h3>Szerviz lezárása</h3>
 

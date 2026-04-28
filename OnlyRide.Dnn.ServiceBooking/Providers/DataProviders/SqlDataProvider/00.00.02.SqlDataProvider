@@ -1,0 +1,33 @@
+﻿/************************************************************/
+/***** SqlDataProvider                                  *****/
+/***** OnlyRide Szervizfoglaló Modul                    *****/
+/***** Verzió: 00.00.02                                 *****/
+/************************************************************/
+
+/* Csak akkor adja hozzá, ha még nincs ilyen oszlop */
+IF COL_LENGTH('{databaseOwner}[{objectQualifier}OnlyRide_ServiceTypes]', 'HotcakesBvin') IS NULL
+BEGIN
+    ALTER TABLE {databaseOwner}[{objectQualifier}OnlyRide_ServiceTypes]
+    ADD [HotcakesBvin] NVARCHAR(50) NULL
+END
+GO
+
+UPDATE {databaseOwner}[{objectQualifier}OnlyRide_ServiceTypes]
+SET HotcakesBvin = '4a79b18b-71c4-4a23-ac07-8b41d0d7a546'
+WHERE Name = N'Általános szerviz'
+GO
+
+UPDATE {databaseOwner}[{objectQualifier}OnlyRide_ServiceTypes]
+SET HotcakesBvin = '523a52c5-7b27-4ec0-b350-4efa3f08fcef'
+WHERE Name = N'Gumicsere'
+GO
+
+UPDATE {databaseOwner}[{objectQualifier}OnlyRide_ServiceTypes]
+SET HotcakesBvin = '55da0051-51fb-4395-b711-ddc0708ee45a'
+WHERE Name = N'Akkumulátor javítás'
+GO
+
+UPDATE {databaseOwner}[{objectQualifier}OnlyRide_ServiceTypes]
+SET HotcakesBvin = '6f523427-bf7e-4e01-a8c6-02df79737b5b'
+WHERE Name = N'Egyéb'
+GO
