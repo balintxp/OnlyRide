@@ -12,6 +12,8 @@
     // weekOffset alapján számítjuk az aktuális hét hétfőjét
     var monday = today.AddDays(-1 * diff).AddDays(weekOffset * 7).Date;
     var weekNum = hu.Calendar.GetWeekOfYear(monday, System.Globalization.CalendarWeekRule.FirstFourDayWeek, DayOfWeek.Monday);
+    var hunTz = TimeZoneInfo.FindSystemTimeZoneById("Central European Standard Time");
+    var nowHun = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, hunTz);
 }
 
 <div class="onlyride-calendar">
@@ -68,7 +70,7 @@
                     b.Status != "Lemondva");
 
                 // Múltbeli időpont ellenőrzése
-                bool isPast = currentSlotDate < DateTime.Now.AddHours(-1);
+                bool isPast = currentSlotDate < nowHun;
 
                 string statusClass = "status-szabad";
                 string statusText = "Szabad";
