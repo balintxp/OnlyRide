@@ -1,6 +1,6 @@
 <dotnetnuke type="Package" version="5.0">
   <packages>
-    <package name="OnlyRide.Dnn.ServiceBooking" type="Module" version="00.00.01">
+    <package name="OnlyRide.Dnn.ServiceBooking" type="Module" version="00.00.02">
       <friendlyName>OnlyRide.Dnn.ServiceBooking</friendlyName>
       <description>OnlyRide.Dnn.ServiceBooking</description>
       <iconFile>~/Icons/Sigma/Software_32X32_Standard.png</iconFile>

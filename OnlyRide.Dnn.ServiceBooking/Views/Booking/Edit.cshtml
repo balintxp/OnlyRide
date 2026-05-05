@@ -1,21 +1,19 @@
 ﻿@inherits DotNetNuke.Web.Mvc.Framework.DnnWebViewPage<OnlyRide.Dnn.ServiceBooking.Models.Booking>
 @using DotNetNuke.Web.Mvc.Helpers
 
-
 @{
-    // Változók előkészítése
     bool isAdmin = Dnn.User.IsSuperUser || Dnn.ModuleContext.IsEditable;
     bool isEditable = ViewBag.IsEditable ?? true;
     var vehicle = ViewBag.Vehicle as OnlyRide.Dnn.ServiceBooking.Models.Vehicle;
 }
 
 <div class="onlyride-edit-card">
-    @* Admin nézet - foglalás részletei + szerkesztési lehetőség a szerviz lezárásához*@
+    @* Admin nézet - foglalás részletei + szerkesztési lehetőség a szerviz lezárásához *@
     @if (isAdmin && Model.BookingId > 0)
     {
         <h2>Foglalás részletei</h2>
 
-        @* Foglalás adatai - csak olvasható összefoglaló *@
+        @* Csak olvasható összefoglaló az ügyfél és jármű adatairól *@
         <div class="onlyride-detail-card">
             <div class="onlyride-detail-row">
                 <span class="onlyride-detail-label">Foglaló neve</span>
@@ -110,29 +108,25 @@
         </form>
     }
 
-    @*User nézet*@
+    @* Felhasználói nézet - új foglalás leadása vagy meglévő megtekintése *@
     else
     {
         <h2>Időpont foglalása</h2>
 
         <form action="@Url.Action("Edit", "Booking")?mid=@Dnn.ModuleContext.ModuleId&tabid=@Dnn.PortalSettings.ActiveTab.TabID" method="post">
             @Html.AntiForgeryToken()
-
-            @* DNN routing mezők *@
             <input type="hidden" name="mid" value="@Dnn.ModuleContext.ModuleId" />
             <input type="hidden" name="BookingId" value="@Model.BookingId" />
             <input type="hidden" name="ModuleId" value="@Dnn.ModuleContext.ModuleId" />
             <input type="hidden" name="SlotId" value="@Model.SlotId" />
             <input type="hidden" name="UserId" value="@Dnn.User.UserID" />
 
-            @* Időpont - mindig csak olvasható *@
             <div class="onlyride-form-group">
                 <label>Választott időpont</label>
                 <input type="text" value="@Model.CreatedOnDate.ToString("yyyy. MM. dd. HH:mm")" readonly style="background:#f5f5f5;" />
                 <input type="hidden" name="CreatedOnDate" value="@Model.CreatedOnDate.ToString("yyyy-MM-dd HH:mm")" />
             </div>
 
-            @* Szolgáltatás típusa - disabled ha nem szerkeszthető *@
             <div class="onlyride-form-group">
                 <label>Szolgáltatás típusa</label>
                 <select name="ServiceTypeId" class="form-control" id="serviceTypeSelect"
@@ -150,13 +144,14 @@
                 </select>
             </div>
 
-            @* Becsült ár és idő - automatikusan töltődik JS-sel *@
+            @* Becsült ár és idő - a kiválasztott szerviz típus alapján JS tölti fel *@
             <div class="onlyride-form-group">
                 <label>Becsült ár és idő</label>
                 <input type="text" id="estimateDisplay" readonly style="background:#f5f5f5;" />
             </div>
 
             <script>
+                // A legördülő változásakor frissíti a becsült ár/idő mezőt
                 function updateEstimate() {
                     var select = document.getElementById('serviceTypeSelect');
                     var option = select.options[select.selectedIndex];
@@ -167,7 +162,6 @@
                 updateEstimate();
             </script>
 
-            @* Jármű adatok *@
             <div class="onlyride-form-group">
                 <label>Jármű típusa</label>
                 <select name="VehicleType" class="form-control"
@@ -179,6 +173,7 @@
                     }
                 </select>
             </div>
+            @* "Egyéb" választásakor jelenik meg ez a mező *@
             <div class="onlyride-form-group" id="egyeb-mezo" style="display:none;">
                 <label>Egyéb jármű leírása</label>
                 <input type="text" name="VehicleNotes" class="form-control"
@@ -203,15 +198,12 @@
                        value="@(vehicle != null ? vehicle.SerialNumber : "")"
                        @(!isEditable ? "readonly style='background:#f5f5f5;'" : "") />
             </div>
-
-            @* Hiba leírása *@
             <div class="onlyride-form-group">
                 <label>Hiba leírása</label>
                 <textarea name="CustomNote" rows="4" placeholder="Írd le a problémát..."
                           @(!isEditable ? "readonly style='background:#f5f5f5;'" : "")>@Model.CustomNote</textarea>
             </div>
 
-            @* Gombok *@
             <div class="onlyride-actions">
                 @if (isEditable)
                 {

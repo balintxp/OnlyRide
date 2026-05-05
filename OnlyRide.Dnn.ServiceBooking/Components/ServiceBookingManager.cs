@@ -32,6 +32,8 @@ namespace OnlyRide.Dnn.ServiceBooking.Components
         // --- Szerviz típusok (ServiceTypes) ---
         IEnumerable<ServiceType> GetServiceTypes(int moduleId);
         ServiceType GetServiceType(int serviceTypeId, int moduleId);
+        void CreateServiceType(ServiceType s);
+        void UpdateServiceType(ServiceType s);
 
         // --- Időpontok (TimeSlots) ---
         IEnumerable<TimeSlot> GetTimeSlots(int moduleId);
@@ -46,9 +48,7 @@ namespace OnlyRide.Dnn.ServiceBooking.Components
 
     internal class ServiceBookingManager : ServiceLocator<IServiceBookingManager, ServiceBookingManager>, IServiceBookingManager
     {
-        // ==========================================
         // BOOKINGS (Foglalások)
-        // ==========================================
         public void CreateBooking(Booking b)
         {
             using (IDataContext ctx = DataContext.Instance())
@@ -104,14 +104,14 @@ namespace OnlyRide.Dnn.ServiceBooking.Components
             }
         }
 
-        // ==========================================
         // SERVICE TYPES (Szerviz típusok)
-        // ==========================================
         public IEnumerable<ServiceType> GetServiceTypes(int moduleId)
         {
             using (IDataContext ctx = DataContext.Instance())
             {
                 var rep = ctx.GetRepository<ServiceType>();
+                // Csak az aktív szerviz típusokat adjuk vissza (IsActive = true)
+                // Az inaktív típusok nem jelennek meg a foglalási űrlapon
                 return rep.Find("WHERE IsActive = @0", true);
             }
         }
@@ -125,9 +125,25 @@ namespace OnlyRide.Dnn.ServiceBooking.Components
             }
         }
 
-        // ==========================================
+        public void CreateServiceType(ServiceType s)
+        {
+            using (IDataContext ctx = DataContext.Instance())
+            {
+                var rep = ctx.GetRepository<ServiceType>();
+                rep.Insert(s);
+            }
+        }
+
+        public void UpdateServiceType(ServiceType s)
+        {
+            using (IDataContext ctx = DataContext.Instance())
+            {
+                var rep = ctx.GetRepository<ServiceType>();
+                rep.Update(s);
+            }
+        }
+
         // TIME SLOTS (Időpontok)
-        // ==========================================
         public IEnumerable<TimeSlot> GetTimeSlots(int moduleId)
         {
             using (IDataContext ctx = DataContext.Instance())
@@ -155,9 +171,7 @@ namespace OnlyRide.Dnn.ServiceBooking.Components
             }
         }
 
-        // ==========================================
         // VEHICLES (Járművek)
-        // ==========================================
         public void CreateVehicle(Vehicle v)
         {
             using (IDataContext ctx = DataContext.Instance())

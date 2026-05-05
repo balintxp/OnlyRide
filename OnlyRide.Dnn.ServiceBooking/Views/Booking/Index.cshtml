@@ -1,24 +1,33 @@
 ﻿@inherits DotNetNuke.Web.Mvc.Framework.DnnWebViewPage<IEnumerable<OnlyRide.Dnn.ServiceBooking.Models.Booking>>
 @using DotNetNuke.Web.Mvc.Helpers
 
+@* Modul saját CSS stíluslap betöltése *@
 <link rel="stylesheet" href="/DesktopModules/MVC/OnlyRide.Dnn.ServiceBooking/module.css">
 
 @{
-    // Magyar lokalizáció és hét számítás
+    // Magyar lokalizáció beállítása (dátum és napnév formázáshoz)
     var hu = new System.Globalization.CultureInfo("hu-HU");
     var today = DateTime.Today;
+
+    // Az aktuális hét hétfőjének kiszámítása
     int diff = (7 + (today.DayOfWeek - DayOfWeek.Monday)) % 7;
     int weekOffset = ViewBag.WeekOffset ?? 0;
-    // weekOffset alapján számítjuk az aktuális hét hétfőjét
+
+    // A megjelenítendő hét hétfőjének dátuma a weekOffset alapján
     var monday = today.AddDays(-1 * diff).AddDays(weekOffset * 7).Date;
+
+    // ISO 8601 szabvány szerinti hétszám kiszámítása magyar lokalizációval
     var weekNum = hu.Calendar.GetWeekOfYear(monday, System.Globalization.CalendarWeekRule.FirstFourDayWeek, DayOfWeek.Monday);
+
+    // Magyar időzóna beállítása a lejárt időpontok helyes meghatározásához
+    // (A szerver UTC időt használ, Magyarország UTC+2, ezért szükséges a konverzió)
     var hunTz = TimeZoneInfo.FindSystemTimeZoneById("Central European Standard Time");
     var nowHun = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, hunTz);
 }
 
 <div class="onlyride-calendar">
 
-    @* Bejelentkezési banner - csak nem bejelentkezett usernek látszik *@
+    @* Bejelentkezési banner – csak nem bejelentkezett látogatóknak jelenik meg *@
     @if (Dnn.User.UserID <= 0)
     {
         <div class="onlyride-login-banner">
@@ -27,7 +36,7 @@
         </div>
     }
 
-    @* Hétváltogató gombok és jelmagyarázat *@
+    @* Hétváltogató gombok és színmagyarázat (jelmagyarázat) *@
     <div class="calendar-controls">
         <a href="@Url.Action("Index", "Booking", new { weekOffset = (int)ViewBag.WeekOffset - 1, mid = Dnn.ModuleContext.ModuleId })" class="dnnSecondaryAction">&lt;</a>
         <span class="week-selector">@monday.Year. @weekNum. hét (@monday.ToString("MMM. dd.", hu) - @monday.AddDays(6).ToString("MMM. dd.", hu))</span>
@@ -44,7 +53,7 @@
 
     <div class="calendar-grid">
 
-        @* Fejléc sor - üres sarok + hét napjai *@
+        @* Fejléc sor: üres sarok cella + a hét 7 napjának nevei és dátumai *@
         <div class="grid-header"></div>
         @for (int i = 0; i < 7; i++)
         {
@@ -55,21 +64,23 @@
             </div>
         }
 
-        @* Időpontok - soronként egy óra, oszloponként egy nap *@
+        @* Naptár cellák: soronként egy óra (8-15), oszloponként egy nap *@
         @for (int hour = 8; hour <= 15; hour++)
         {
             <div class="time-label">@hour:00</div>
+
             for (int day = 0; day < 7; day++)
             {
+                // Az adott cella dátuma és időpontja (pl. 2026-05-05 10:00)
                 var currentSlotDate = monday.AddDays(day).AddHours(hour);
 
-                // Lemondott foglalásokat nem mutatjuk
+                // Keresünk aktív foglalást erre az időpontra
                 var booking = Model.FirstOrDefault(b =>
                     b.CreatedOnDate.Date == currentSlotDate.Date &&
                     b.CreatedOnDate.Hour == hour &&
                     b.Status != "Lemondva");
 
-                // Múltbeli időpont ellenőrzése
+                // Lejárt időpont: magyar idő szerint már elmúlt
                 bool isPast = currentSlotDate < nowHun;
 
                 string statusClass = "status-szabad";
@@ -78,6 +89,7 @@
 
                 if (isPast)
                 {
+                    // Lejárt időpont: szürke, nem kattintható
                     statusClass = "status-lejart";
                     statusText = "";
                 }
@@ -86,38 +98,43 @@
                     bool isMine = booking.UserId == Dnn.User.UserID;
                     bool isAdmin = Dnn.User.IsSuperUser || Dnn.ModuleContext.IsEditable;
 
-                    // Kész státuszú foglalás - fuchsia
                     if (booking.Status == "Kész")
                     {
+                        // Lezárt szerviz – fuchsia szín
+                        // Admin megnyithatja, normál user nem
                         statusClass = "status-kesz";
                         statusText = "Kész";
                         actionUrl = isAdmin ? string.Format("{0}?bookingId={1}&mid={2}",
                             Url.Action("Edit", "Booking"), booking.BookingId, Dnn.ModuleContext.ModuleId) : "#";
                     }
-                    // Folyamatban státuszú foglalás - sárga
                     else if (booking.Status == "Folyamatban")
                     {
+                        // Folyamatban lévő szerviz – sárga szín
+                        // Admin és a foglaló felhasználó is megnyithatja
                         statusClass = "status-folyamatban";
                         statusText = "Folyamatban";
                         actionUrl = (isMine || isAdmin) ? string.Format("{0}?bookingId={1}&mid={2}",
                             Url.Action("Edit", "Booking"), booking.BookingId, Dnn.ModuleContext.ModuleId) : "#";
                     }
-                    // Függőben státuszú foglalás - normál foglalt/saját nézet
                     else
                     {
+                        // Függőben lévő foglalás
+                        // - Saját foglalás: kék szín, kattintható
+                        // - Más foglalása: piros szín, csak admin nyithatja meg
                         statusClass = isMine ? "status-sajat" : "status-foglalt";
-                        statusText = isMine ? "Saját" : (isAdmin ? "Foglalt" : "Foglalt");
+                        statusText = isMine ? "Saját" : "Foglalt";
                         actionUrl = (isMine || isAdmin) ? string.Format("{0}?bookingId={1}&mid={2}",
                             Url.Action("Edit", "Booking"), booking.BookingId, Dnn.ModuleContext.ModuleId) : "#";
                     }
                 }
                 else if (Dnn.User.UserID > 0)
                 {
-                    // Szabad időpont - bejelentkezett user tud foglalni
+                    // Szabad időpont bejelentkezett felhasználónak – zöld, kattintható
                     statusClass = "status-szabad";
                     statusText = "Szabad";
                     actionUrl = Url.Action("Edit", "Booking", new { date = currentSlotDate.ToString("yyyy-MM-dd HH:mm") });
                 }
+                // Ha nincs bejelentkezve: szabad felirat, de nem kattintható (#)
 
                 <div class="slot-card @statusClass"
                      onclick="location.href='@actionUrl'">
