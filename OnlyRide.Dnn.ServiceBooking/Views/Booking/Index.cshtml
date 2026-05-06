@@ -38,10 +38,32 @@
 
     @* Hétváltogató gombok és színmagyarázat (jelmagyarázat) *@
     <div class="calendar-controls">
-        <a href="@Url.Action("Index", "Booking", new { weekOffset = (int)ViewBag.WeekOffset - 1, mid = Dnn.ModuleContext.ModuleId })" class="dnnSecondaryAction">&lt;</a>
-        <span class="week-selector">@monday.Year. @weekNum. hét (@monday.ToString("MMM. dd.", hu) - @monday.AddDays(6).ToString("MMM. dd.", hu))</span>
-        <a href="@Url.Action("Index", "Booking", new { weekOffset = (int)ViewBag.WeekOffset + 1, mid = Dnn.ModuleContext.ModuleId })" class="dnnSecondaryAction">&gt;</a>
+        @{
+            int currentOffset = ViewBag.WeekOffset ?? 0;
+            int maxWeeks = ViewBag.MaxWeeks ?? 4;
+        }
 
+        @* Előző hét gomb - csak ha nem vagyunk az aktuális héten *@
+        @if (currentOffset > 0)
+        {
+            <a href="@Url.Action("Index", "Booking", new { weekOffset = currentOffset - 1, mid = Dnn.ModuleContext.ModuleId })" class="dnnSecondaryAction">&lt;</a>
+        }
+        else
+        {
+            <span class="dnnSecondaryAction" style="opacity:0.3; cursor:default;">&lt;</span>
+        }
+
+        <span class="week-selector">@monday.Year. @weekNum. hét (@monday.ToString("MMM. dd.", hu) - @monday.AddDays(6).ToString("MMM. dd.", hu))</span>
+
+        @* Következő hét gomb - csak ha nem értük el a maximumot *@
+        @if (currentOffset < maxWeeks)
+        {
+            <a href="@Url.Action("Index", "Booking", new { weekOffset = currentOffset + 1, mid = Dnn.ModuleContext.ModuleId })" class="dnnSecondaryAction">&gt;</a>
+        }
+        else
+        {
+            <span class="dnnSecondaryAction" style="opacity:0.3; cursor:default;">&gt;</span>
+        }
         <div class="calendar-legend">
             <span class="legend-item"><span class="dot szabad"></span> Szabad</span>
             <span class="legend-item"><span class="dot foglalt"></span> Foglalt</span>

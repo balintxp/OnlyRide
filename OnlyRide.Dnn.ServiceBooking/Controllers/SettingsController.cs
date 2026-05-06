@@ -30,9 +30,9 @@ namespace OnlyRide.Dnn.ServiceBooking.Controllers
         public ActionResult Settings()
         {
             var settings = new Models.Settings();
-            settings.Setting1 = ModuleContext.Configuration.ModuleSettings.GetValueOrDefault("OnlyRide.Dnn.ServiceBooking_Setting1", false);
-            settings.Setting2 = ModuleContext.Configuration.ModuleSettings.GetValueOrDefault("OnlyRide.Dnn.ServiceBooking_Setting2", System.DateTime.Now);
-
+            // MaxWeeks kiolvasása, alapértelmezett: 4 hét
+            settings.MaxWeeks = ModuleContext.Configuration.ModuleSettings
+                .GetValueOrDefault("OnlyRide_MaxWeeks", 4);
             return View(settings);
         }
 
@@ -46,9 +46,7 @@ namespace OnlyRide.Dnn.ServiceBooking.Controllers
         [DotNetNuke.Web.Mvc.Framework.ActionFilters.ValidateAntiForgeryToken]
         public ActionResult Settings(Models.Settings settings)
         {
-            ModuleContext.Configuration.ModuleSettings["OnlyRide.Dnn.ServiceBooking_Setting1"] = settings.Setting1.ToString();
-            ModuleContext.Configuration.ModuleSettings["OnlyRide.Dnn.ServiceBooking_Setting2"] = settings.Setting2.ToUniversalTime().ToString("u");
-
+            ModuleContext.Configuration.ModuleSettings["OnlyRide_MaxWeeks"] = settings.MaxWeeks.ToString();
             return RedirectToDefaultRoute();
         }
     }

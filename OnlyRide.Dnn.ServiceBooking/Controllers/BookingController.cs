@@ -1,14 +1,15 @@
-﻿using DotNetNuke.Entities.Users;
+﻿using DotNetNuke.Collections;
+using DotNetNuke.Common;
+using DotNetNuke.Entities.Users;
 using DotNetNuke.Web.Mvc.Framework.ActionFilters;
 using DotNetNuke.Web.Mvc.Framework.Controllers;
-using DotNetNuke.Common;
+using Hotcakes.Commerce;
+using Hotcakes.Commerce.Orders;
 using OnlyRide.Dnn.ServiceBooking.Components;
 using OnlyRide.Dnn.ServiceBooking.Models;
 using System;
 using System.Linq;
 using System.Web.Mvc;
-using Hotcakes.Commerce;
-using Hotcakes.Commerce.Orders;
 
 namespace OnlyRide.Dnn.ServiceBooking.Controllers
 {
@@ -342,6 +343,14 @@ namespace OnlyRide.Dnn.ServiceBooking.Controllers
         /// - weekOffset alapján váltja a heti nézetet (0 = aktuális hét)
         public ActionResult Index(int weekOffset = 0)
         {
+            // MaxWeeks beállítás kiolvasása (alapértelmezett: 4)
+            int maxWeeks = ModuleContext.Configuration.ModuleSettings
+                .GetValueOrDefault("OnlyRide_MaxWeeks", 4);
+
+            // weekOffset korlátozása: nem mehet 0 alá (múltba) és maxWeeks fölé
+            if (weekOffset < 0) weekOffset = 0;
+            if (weekOffset > maxWeeks) weekOffset = maxWeeks;
+
             // Hotcakes szinkronizáció: minden oldalbetöltésnél ellenőrizzük,
             // hogy van-e új SZERVIZ- előtagú termék a Hotcakesben amit még nem vettünk fel
             var hccApp = HotcakesApplication.Current;
@@ -382,6 +391,7 @@ namespace OnlyRide.Dnn.ServiceBooking.Controllers
 
             var bookings = ServiceBookingManager.Instance.GetBookings(ModuleContext.ModuleId);
             ViewBag.WeekOffset = weekOffset;
+            ViewBag.MaxWeeks = maxWeeks;
             return View(bookings);
         }
 

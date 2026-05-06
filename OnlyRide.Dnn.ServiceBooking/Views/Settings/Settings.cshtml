@@ -1,20 +1,15 @@
-﻿@inherits DotNetNuke.Web.Mvc.Framework.DnnWebViewPage <OnlyRide.Dnn.ServiceBooking.Models.Settings>
-
+﻿@inherits DotNetNuke.Web.Mvc.Framework.DnnWebViewPage<OnlyRide.Dnn.ServiceBooking.Models.Settings>
 @using DotNetNuke.Web.Mvc.Helpers
 
-<h2 id="dnnSitePanel-BasicSettings" class="dnnFormSectionHead"><a href="" class="dnnSectionExpanded">@Dnn.LocalizeString("BasicSettings")</a></h2>
+<h2 class="dnnFormSectionHead">
+    <a href="" class="dnnSectionExpanded">Foglalási beállítások</a>
+</h2>
 <fieldset>
     <div class="dnnFormItem">
-        <div class="dnnLabel" style="position: relative;">
-            @Html.LabelFor(m => Model.Setting1, new { @class = "col-md-2 control-label" })
+        <div class="dnnLabel">
+            <label>Maximális foglalási távolság (hét)</label>
         </div>
-        @Html.CheckBoxFor(m => Model.Setting1)
-    </div>
-    <div class="dnnFormItem">
-        <div class="dnnLabel" style="position: relative;">
-            @Html.LabelFor(m => Model.Setting2, new { @class = "col-md-2 control-label" })
-        </div>
-        @Html.TextBoxFor(m => Model.Setting2)
+        @Html.TextBoxFor(m => m.MaxWeeks, new { @class = "form-control", @type = "number", @min = "1", @max = "52" })
+        <p style="color:#888; font-size:12px;">Hány héttel előre engedélyezett a foglalás? (pl. 4 = 4 hétre előre)</p>
     </div>
 </fieldset>
-
