@@ -311,3 +311,37 @@
         text-decoration: underline;
         font-weight: 700;
     }
+
+/* RESZPONZÍV DESIGN */
+
+@media (max-width: 768px) {
+    .onlyride-calendar .calendar-controls {
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .onlyride-calendar .week-selector {
+        white-space: nowrap;
+        font-size: 13px;
+        flex-shrink: 1;
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .onlyride-calendar .calendar-legend {
+        width: 100%;
+        order: 99;
+        flex-wrap: wrap;
+    }
+
+    .onlyride-calendar .calendar-grid-wrapper {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .onlyride-calendar .calendar-grid {
+        grid-template-columns: 60px repeat(7, 110px) !important;
+        min-width: 830px;
+    }
+}

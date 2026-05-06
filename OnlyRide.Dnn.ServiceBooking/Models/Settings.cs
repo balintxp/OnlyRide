@@ -1,4 +1,5 @@
-﻿using System;
+﻿using System.Collections.Generic;
+using OnlyRide.Dnn.ServiceBooking.Models;
 
 namespace OnlyRide.Dnn.ServiceBooking.Models
 {
@@ -6,5 +7,8 @@ namespace OnlyRide.Dnn.ServiceBooking.Models
     {
         // Hány héttel előre engedélyezett a foglalás (alapértelmezett: 4)
         public int MaxWeeks { get; set; } = 4;
+
+        // Szerviz típusok listája az EstimatedMinutes szerkesztéséhez
+        public List<ServiceType> ServiceTypes { get; set; } = new List<ServiceType>();
     }
 }

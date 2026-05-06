@@ -12,4 +12,16 @@
         @Html.TextBoxFor(m => m.MaxWeeks, new { @class = "form-control", @type = "number", @min = "1", @max = "52" })
         <p style="color:#888; font-size:12px;">Hány héttel előre engedélyezett a foglalás? (pl. 4 = 4 hétre előre)</p>
     </div>
+
+    <h3 style="margin-top:20px;">Szerviz típusok becsült ideje</h3>
+    @foreach (var st in Model.ServiceTypes)
+    {
+        <div class="dnnFormItem">
+            <div class="dnnLabel">
+                <label>@st.Name (perc)</label>
+            </div>
+            <input type="number" name="ServiceTypeMinutes_@st.ServiceTypeId"
+                   value="@st.EstimatedMinutes" class="form-control" min="1" />
+        </div>
+    }
 </fieldset>

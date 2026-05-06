@@ -72,97 +72,98 @@
             <span class="legend-item"><span class="dot folyamatban"></span> Folyamatban</span>
         </div>
     </div>
+    <div class="calendar-grid-wrapper">
+        <div class="calendar-grid">
 
-    <div class="calendar-grid">
-
-        @* Fejléc sor: üres sarok cella + a hét 7 napjának nevei és dátumai *@
-        <div class="grid-header"></div>
-        @for (int i = 0; i < 7; i++)
-        {
-            var dayDate = monday.AddDays(i);
-            <div class="grid-header">
-                @hu.TextInfo.ToTitleCase(dayDate.ToString("dddd", hu))<br />
-                <small>@dayDate.ToString("MMM. dd.", hu)</small>
-            </div>
-        }
-
-        @* Naptár cellák: soronként egy óra (8-15), oszloponként egy nap *@
-        @for (int hour = 8; hour <= 15; hour++)
-        {
-            <div class="time-label">@hour:00</div>
-
-            for (int day = 0; day < 7; day++)
+            @* Fejléc sor: üres sarok cella + a hét 7 napjának nevei és dátumai *@
+            <div class="grid-header"></div>
+            @for (int i = 0; i < 7; i++)
             {
-                // Az adott cella dátuma és időpontja (pl. 2026-05-05 10:00)
-                var currentSlotDate = monday.AddDays(day).AddHours(hour);
-
-                // Keresünk aktív foglalást erre az időpontra
-                var booking = Model.FirstOrDefault(b =>
-                    b.CreatedOnDate.Date == currentSlotDate.Date &&
-                    b.CreatedOnDate.Hour == hour &&
-                    b.Status != "Lemondva");
-
-                // Lejárt időpont: magyar idő szerint már elmúlt
-                bool isPast = currentSlotDate < nowHun;
-
-                string statusClass = "status-szabad";
-                string statusText = "Szabad";
-                string actionUrl = "#";
-
-                if (isPast)
-                {
-                    // Lejárt időpont: szürke, nem kattintható
-                    statusClass = "status-lejart";
-                    statusText = "";
-                }
-                else if (booking != null)
-                {
-                    bool isMine = booking.UserId == Dnn.User.UserID;
-                    bool isAdmin = Dnn.User.IsSuperUser || Dnn.ModuleContext.IsEditable;
-
-                    if (booking.Status == "Kész")
-                    {
-                        // Lezárt szerviz – fuchsia szín
-                        // Admin megnyithatja, normál user nem
-                        statusClass = "status-kesz";
-                        statusText = "Kész";
-                        actionUrl = isAdmin ? string.Format("{0}?bookingId={1}&mid={2}",
-                            Url.Action("Edit", "Booking"), booking.BookingId, Dnn.ModuleContext.ModuleId) : "#";
-                    }
-                    else if (booking.Status == "Folyamatban")
-                    {
-                        // Folyamatban lévő szerviz – sárga szín
-                        // Admin és a foglaló felhasználó is megnyithatja
-                        statusClass = "status-folyamatban";
-                        statusText = "Folyamatban";
-                        actionUrl = (isMine || isAdmin) ? string.Format("{0}?bookingId={1}&mid={2}",
-                            Url.Action("Edit", "Booking"), booking.BookingId, Dnn.ModuleContext.ModuleId) : "#";
-                    }
-                    else
-                    {
-                        // Függőben lévő foglalás
-                        // - Saját foglalás: kék szín, kattintható
-                        // - Más foglalása: piros szín, csak admin nyithatja meg
-                        statusClass = isMine ? "status-sajat" : "status-foglalt";
-                        statusText = isMine ? "Saját" : "Foglalt";
-                        actionUrl = (isMine || isAdmin) ? string.Format("{0}?bookingId={1}&mid={2}",
-                            Url.Action("Edit", "Booking"), booking.BookingId, Dnn.ModuleContext.ModuleId) : "#";
-                    }
-                }
-                else if (Dnn.User.UserID > 0)
-                {
-                    // Szabad időpont bejelentkezett felhasználónak – zöld, kattintható
-                    statusClass = "status-szabad";
-                    statusText = "Szabad";
-                    actionUrl = Url.Action("Edit", "Booking", new { date = currentSlotDate.ToString("yyyy-MM-dd HH:mm") });
-                }
-                // Ha nincs bejelentkezve: szabad felirat, de nem kattintható (#)
-
-                <div class="slot-card @statusClass"
-                     onclick="location.href='@actionUrl'">
-                    @statusText
+                var dayDate = monday.AddDays(i);
+                <div class="grid-header">
+                    @hu.TextInfo.ToTitleCase(dayDate.ToString("dddd", hu))<br />
+                    <small>@dayDate.ToString("MMM. dd.", hu)</small>
                 </div>
             }
-        }
+
+            @* Naptár cellák: soronként egy óra (8-15), oszloponként egy nap *@
+            @for (int hour = 8; hour <= 15; hour++)
+            {
+                <div class="time-label">@hour:00</div>
+
+                for (int day = 0; day < 7; day++)
+                {
+                    // Az adott cella dátuma és időpontja (pl. 2026-05-05 10:00)
+                    var currentSlotDate = monday.AddDays(day).AddHours(hour);
+
+                    // Keresünk aktív foglalást erre az időpontra
+                    var booking = Model.FirstOrDefault(b =>
+                        b.CreatedOnDate.Date == currentSlotDate.Date &&
+                        b.CreatedOnDate.Hour == hour &&
+                        b.Status != "Lemondva");
+
+                    // Lejárt időpont: magyar idő szerint már elmúlt
+                    bool isPast = currentSlotDate < nowHun;
+
+                    string statusClass = "status-szabad";
+                    string statusText = "Szabad";
+                    string actionUrl = "#";
+
+                    if (isPast)
+                    {
+                        // Lejárt időpont: szürke, nem kattintható
+                        statusClass = "status-lejart";
+                        statusText = "";
+                    }
+                    else if (booking != null)
+                    {
+                        bool isMine = booking.UserId == Dnn.User.UserID;
+                        bool isAdmin = Dnn.User.IsSuperUser || Dnn.ModuleContext.IsEditable;
+
+                        if (booking.Status == "Kész")
+                        {
+                            // Lezárt szerviz – fuchsia szín
+                            // Admin megnyithatja, normál user nem
+                            statusClass = "status-kesz";
+                            statusText = "Kész";
+                            actionUrl = isAdmin ? string.Format("{0}?bookingId={1}&mid={2}",
+                                Url.Action("Edit", "Booking"), booking.BookingId, Dnn.ModuleContext.ModuleId) : "#";
+                        }
+                        else if (booking.Status == "Folyamatban")
+                        {
+                            // Folyamatban lévő szerviz – sárga szín
+                            // Admin és a foglaló felhasználó is megnyithatja
+                            statusClass = "status-folyamatban";
+                            statusText = "Folyamatban";
+                            actionUrl = (isMine || isAdmin) ? string.Format("{0}?bookingId={1}&mid={2}",
+                                Url.Action("Edit", "Booking"), booking.BookingId, Dnn.ModuleContext.ModuleId) : "#";
+                        }
+                        else
+                        {
+                            // Függőben lévő foglalás
+                            // - Saját foglalás: kék szín, kattintható
+                            // - Más foglalása: piros szín, csak admin nyithatja meg
+                            statusClass = isMine ? "status-sajat" : "status-foglalt";
+                            statusText = isMine ? "Saját" : "Foglalt";
+                            actionUrl = (isMine || isAdmin) ? string.Format("{0}?bookingId={1}&mid={2}",
+                                Url.Action("Edit", "Booking"), booking.BookingId, Dnn.ModuleContext.ModuleId) : "#";
+                        }
+                    }
+                    else if (Dnn.User.UserID > 0)
+                    {
+                        // Szabad időpont bejelentkezett felhasználónak – zöld, kattintható
+                        statusClass = "status-szabad";
+                        statusText = "Szabad";
+                        actionUrl = Url.Action("Edit", "Booking", new { date = currentSlotDate.ToString("yyyy-MM-dd HH:mm") });
+                    }
+                    // Ha nincs bejelentkezve: szabad felirat, de nem kattintható (#)
+
+                    <div class="slot-card @statusClass"
+                         onclick="location.href='@actionUrl'">
+                        @statusText
+                    </div>
+                }
+            }
+        </div>
     </div>
 </div>
