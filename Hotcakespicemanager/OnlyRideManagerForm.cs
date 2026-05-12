@@ -1,13 +1,14 @@
 ﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
+using System.Reflection.Emit;
+using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement;
-using System.Text;
-using Newtonsoft.Json.Linq;
 
 namespace Hotcakespicemanager
 {
@@ -161,10 +162,86 @@ namespace Hotcakespicemanager
         {
 
         }
+        private async void button4_Click(object sender, EventArgs e)
+        {
+            ShowBookingsView();
+
+            SetupBookingsGrid();
+
+            var bookings = (await LoadBookingsAsync())
+                .OrderByDescending(b => b.BookingId)
+                .ToList();
+
+            dataGridView1.DataSource = null;
+            dataGridView1.DataSource = bookings;
+        }
+
+        private void ShowBookingsView()
+        {
+            listBox1.Visible = false;
+            groupBox1.Visible = false; 
+
+            panel3.Visible = false; 
+
+            trackBar1.Visible = false;
+            trackBar2.Visible = false;
+            textBox1.Visible = false;
+            textBox2.Visible = false;
+            label2.Visible = false; 
+            label3.Visible = false; 
+
+            comboBox2.Visible = false;
+            textBox3.Visible = false;
+            checkBox1.Visible = false;
+            checkBox2.Visible = false;
+            button3.Visible = false;
+            button2.Visible = false;
+
+            label4.Visible = false;
+            label6.Visible = false;
+
+            dataGridView1.Location = new Point(20, 120);
+            dataGridView1.Size = new Size(this.ClientSize.Width - 40, this.ClientSize.Height - 140);
+            dataGridView1.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+        }
 
         private async void button1_Click(object sender, EventArgs e)
         {
+            InitializeGrid();
+
+            dataGridView1.DataSource = null;
+            dataGridView1.DataSource = filteredProducts;
+            ShowProductsView();
             await LoadProductsAsync();
+
+        }
+        private void ShowProductsView()
+        {
+            listBox1.Visible = true;
+            groupBox1.Visible = true;
+
+            panel1.Visible = true;
+
+            trackBar1.Visible = true;
+            trackBar2.Visible = true;
+            textBox1.Visible = true;
+            textBox2.Visible = true;
+            label2.Visible = true;
+            label3.Visible = true;
+
+            comboBox2.Visible = true;
+            textBox3.Visible = true;
+            checkBox1.Visible = true;
+            checkBox2.Visible = true;
+            button3.Visible = true;
+            button2.Visible = true;
+
+            label4.Visible = true;
+            label5.Visible = true;
+            label6.Visible = true;
+
+            dataGridView1.Location = new Point(205, 132);
+            dataGridView1.Size = new Size(698, 420);
         }
         private async Task LoadProductsAsync()
         {
@@ -194,7 +271,6 @@ namespace Hotcakespicemanager
                     textBox2.Text = "0";
                 }
 
-                MessageBox.Show($"Betöltve: {filteredProducts.Count} termék");
             }
             catch (Exception ex)
             {
@@ -566,6 +642,91 @@ namespace Hotcakespicemanager
 
             product.SitePrice = product.NewPrice.Value;
             return true;
+        }
+
+        private const string BOOKINGS_URL =
+                "http://20.107.173.235/API/OnlyRide.Dnn.ServiceBooking/BookingApi/GetBookingsByServiceType?moduleId=454&format=json";
+        private async Task<List<ServiceBooking>> LoadBookingsAsync()
+        {
+            var response = await httpClient.GetAsync(BOOKINGS_URL);
+            var json = await response.Content.ReadAsStringAsync();
+
+            if (!response.IsSuccessStatusCode)
+            {
+                MessageBox.Show("Foglalás API hiba:\n" + json);
+                return new List<ServiceBooking>();
+            }
+
+            var serviceTypes = JsonConvert.DeserializeObject<List<ServiceTypeBookingResponse>>(json);
+
+            var bookings = serviceTypes
+                .SelectMany(service =>
+                    (service.Bookings ?? new List<ServiceBooking>())
+                    .Select(booking =>
+                    {
+                        booking.ServiceTypeName = service.ServiceTypeName;
+                        return booking;
+                    }))
+                .ToList();
+
+            return bookings;
+        }
+
+        private void SetupBookingsGrid()
+        {
+            dataGridView1.AutoGenerateColumns = false;
+            dataGridView1.Columns.Clear();
+
+            dataGridView1.Columns.Add(new DataGridViewTextBoxColumn
+            {
+                DataPropertyName = "BookingId",
+                HeaderText = "Foglalás ID",
+                Width = 100
+            });
+
+            dataGridView1.Columns.Add(new DataGridViewTextBoxColumn
+            {
+                DataPropertyName = "ServiceTypeName",
+                HeaderText = "Szerviz típusa",
+                Width = 220
+            });
+
+            dataGridView1.Columns.Add(new DataGridViewTextBoxColumn
+            {
+                DataPropertyName = "Status",
+                HeaderText = "Státusz",
+                Width = 120
+            });
+
+            dataGridView1.Columns.Add(new DataGridViewTextBoxColumn
+            {
+                DataPropertyName = "CreatedOnDate",
+                HeaderText = "Dátum",
+                Width = 150,
+                DefaultCellStyle = { Format = "yyyy.MM.dd HH:mm" }
+            });
+
+            dataGridView1.Columns.Add(new DataGridViewTextBoxColumn
+            {
+                DataPropertyName = "ActualPrice",
+                HeaderText = "Ár",
+                Width = 100,
+                DefaultCellStyle = { Format = "N0" }
+            });
+
+            dataGridView1.Columns.Add(new DataGridViewTextBoxColumn
+            {
+                DataPropertyName = "ActualMinutes",
+                HeaderText = "Perc",
+                Width = 80
+            });
+
+            dataGridView1.Columns.Add(new DataGridViewTextBoxColumn
+            {
+                DataPropertyName = "CustomNote",
+                HeaderText = "Megjegyzés",
+                Width = 250
+            });
         }
     }
 }

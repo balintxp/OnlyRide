@@ -52,6 +52,7 @@
             pictureBox1 = new PictureBox();
             groupBox1 = new GroupBox();
             panel3 = new Panel();
+            button4 = new Button();
             ((System.ComponentModel.ISupportInitialize)trackBar1).BeginInit();
             ((System.ComponentModel.ISupportInitialize)dataGridView1).BeginInit();
             ((System.ComponentModel.ISupportInitialize)trackBar2).BeginInit();
@@ -109,7 +110,7 @@
             button1.Name = "button1";
             button1.Size = new Size(75, 23);
             button1.TabIndex = 8;
-            button1.Text = "Betöltés";
+            button1.Text = "Termékek";
             button1.UseVisualStyleBackColor = false;
             button1.Click += button1_Click;
             // 
@@ -299,12 +300,23 @@
             panel3.Size = new Size(10, 416);
             panel3.TabIndex = 24;
             // 
+            // button4
+            // 
+            button4.Location = new Point(882, 81);
+            button4.Name = "button4";
+            button4.Size = new Size(75, 23);
+            button4.TabIndex = 25;
+            button4.Text = "Foglalások";
+            button4.UseVisualStyleBackColor = true;
+            button4.Click += this.button4_Click;
+            // 
             // OnlyRideManagerForm
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = Color.White;
             ClientSize = new Size(1059, 585);
+            Controls.Add(button4);
             Controls.Add(panel3);
             Controls.Add(groupBox1);
             Controls.Add(panel1);
@@ -363,5 +375,6 @@
         private GroupBox groupBox1;
         private Panel panel2;
         private Panel panel3;
+        private Button button4;
     }
 }
