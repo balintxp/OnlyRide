@@ -11,7 +11,7 @@ using Newtonsoft.Json.Linq;
 
 namespace Hotcakespicemanager
 {
-    public partial class Form1 : Form
+    public partial class OnlyRideManagerForm : Form
     {
         private decimal maxSitePrice = 0;
         private const string BASE_URL = "http://20.107.173.235/DesktopModules/Hotcakes/API/rest/v1/";
@@ -23,7 +23,7 @@ namespace Hotcakespicemanager
         private List<Category> allCategories = new List<Category>();
 
 
-        public Form1()
+        public OnlyRideManagerForm()
         {
             InitializeComponent();
             InitializeApi();
@@ -35,6 +35,80 @@ namespace Hotcakespicemanager
             comboBox2.SelectedIndex = 0;
 
             _ = LoadCategoriesAsync();
+            
+            //kijeloels
+            dataGridView1.DefaultCellStyle.SelectionBackColor =
+                Color.FromArgb(76, 175, 80);
+
+            dataGridView1.DefaultCellStyle.SelectionForeColor =
+                Color.White;
+
+            dataGridView1.RowHeadersVisible = false;
+
+            dataGridView1.SelectionMode =
+                DataGridViewSelectionMode.FullRowSelect;
+            
+            //fejlec
+            dataGridView1.EnableHeadersVisualStyles = false;
+            dataGridView1.ColumnHeadersDefaultCellStyle.BackColor = Color.FromArgb(35, 35, 35);
+            dataGridView1.ColumnHeadersDefaultCellStyle.ForeColor = Color.White;
+            dataGridView1.ColumnHeadersDefaultCellStyle.Font = new Font("Segoe UI", 10, FontStyle.Bold);
+            dataGridView1.ColumnHeadersDefaultCellStyle.SelectionBackColor =
+                Color.FromArgb(35, 35, 35);
+
+            dataGridView1.ColumnHeadersDefaultCellStyle.SelectionForeColor =
+                Color.White;
+
+            //ar
+            dataGridView1.Columns[2].DefaultCellStyle.Format = "N0";
+            dataGridView1.Columns[3].DefaultCellStyle.Format = "N0";
+            dataGridView1.Columns[2].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleRight;
+            dataGridView1.Columns[3].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleRight;
+
+            trackBar1.TickStyle = TickStyle.None;
+            trackBar2.TickStyle = TickStyle.None;
+
+
+
+            checkBox1.FlatStyle = FlatStyle.Flat;
+            checkBox2.FlatStyle = FlatStyle.Flat;
+
+            checkBox1.Font = new Font("Segoe UI", 9);
+            checkBox2.Font = new Font("Segoe UI", 9);
+            //listbox kijeloles
+            listBox1.DrawMode = DrawMode.OwnerDrawFixed;
+
+            listBox1.DrawItem += (s, e) =>
+            {
+                if (e.Index < 0) return;
+
+                bool selected = (e.State & DrawItemState.Selected) == DrawItemState.Selected;
+
+                Color backColor = selected
+                    ? Color.FromArgb(76, 175, 80)
+                    : Color.White;
+
+                Color textColor = selected
+                    ? Color.White
+                    : Color.Black;
+
+                using (SolidBrush bg = new SolidBrush(backColor))
+                using (SolidBrush fg = new SolidBrush(textColor))
+                {
+                    e.Graphics.FillRectangle(bg, e.Bounds);
+
+                    var category = listBox1.Items[e.Index] as Category;
+                    string text = category?.Name ?? listBox1.Items[e.Index].ToString();
+
+                    e.Graphics.DrawString(
+                        text,
+                        e.Font,
+                        fg,
+                        e.Bounds);
+                }
+
+                e.DrawFocusRectangle();
+            };
         }
         private void InitializeApi()
         {
