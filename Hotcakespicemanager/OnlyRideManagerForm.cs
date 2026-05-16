@@ -22,6 +22,7 @@ namespace Hotcakespicemanager
         private List<Product> allProducts = new List<Product>();
         private List<Product> filteredProducts = new List<Product>();
         private List<Category> allCategories = new List<Category>();
+        private List<ServiceBooking> allBookings = new List<ServiceBooking>();
 
 
         public OnlyRideManagerForm()
@@ -35,8 +36,25 @@ namespace Hotcakespicemanager
             comboBox2.Items.Add("normál");
             comboBox2.SelectedIndex = 0;
 
+            this.StartPosition = FormStartPosition.CenterScreen;
+
+            this.Size = new Size(1200, 750);
+
+            this.MinimumSize = new Size(1200, 750);
+
+            this.MaximumSize = new Size(1200, 750);
+
+            this.FormBorderStyle = FormBorderStyle.FixedSingle;
+
+            this.MaximizeBox = false;
+
             _ = LoadCategoriesAsync();
-            
+
+            cmbType.SelectedIndexChanged += (s, e) => ApplyBookingFilters();
+            cmbStatus.SelectedIndexChanged += (s, e) => ApplyBookingFilters();
+            dtpDate.ValueChanged += (s, e) => ApplyBookingFilters();
+            textBox4.TextChanged += (s, e) => ApplyBookingFilters();
+
             //kijeloels
             dataGridView1.DefaultCellStyle.SelectionBackColor =
                 Color.FromArgb(76, 175, 80);
@@ -172,8 +190,81 @@ namespace Hotcakespicemanager
                 .OrderByDescending(b => b.BookingId)
                 .ToList();
 
+            allBookings = bookings;
+
+            FillBookingFilters();
+
+            ApplyBookingFilters();
+        }
+
+        private void FillBookingFilters()
+        {
+            cmbType.Items.Clear();
+            cmbType.Items.Add("Összes");
+
+            cmbType.Items.AddRange(allBookings
+                .Select(x => x.ServiceTypeName)
+                .Where(x => !string.IsNullOrWhiteSpace(x))
+                .Distinct()
+                .ToArray());
+
+            cmbType.SelectedIndex = 0;
+
+
+            cmbStatus.Items.Clear();
+            cmbStatus.Items.Add("Összes");
+
+            cmbStatus.Items.AddRange(allBookings
+                .Select(x => x.Status)
+                .Where(x => !string.IsNullOrWhiteSpace(x))
+                .Distinct()
+                .ToArray());
+
+            cmbStatus.SelectedIndex = 0;
+
+            dtpDate.Checked = false;
+        }
+
+        private void ApplyBookingFilters()
+        {
+            var filtered = allBookings.AsEnumerable();
+
+            // Típus
+            if (cmbType.SelectedIndex > 0)
+            {
+                filtered = filtered.Where(x =>
+                    x.ServiceTypeName == cmbType.SelectedItem.ToString());
+            }
+
+            // Státusz
+            if (cmbStatus.SelectedIndex > 0)
+            {
+                filtered = filtered.Where(x =>
+                    x.Status == cmbStatus.SelectedItem.ToString());
+            }
+
+            // Dátum
+            if (dtpDate.Checked)
+            {
+                filtered = filtered.Where(x =>
+                    x.CreatedOnDate.Date == dtpDate.Value.Date);
+            }
+
+            // Megjegyzés
+            if (!string.IsNullOrWhiteSpace(textBox4.Text))
+            {
+                string search = textBox4.Text.ToLower();
+
+                filtered = filtered.Where(x =>
+                    x.CustomNote != null &&
+                    x.CustomNote.ToLower().Contains(search));
+            }
+
             dataGridView1.DataSource = null;
-            dataGridView1.DataSource = bookings;
+
+            dataGridView1.DataSource = filtered
+                .OrderByDescending(x => x.BookingId)
+                .ToList();
         }
 
         private void ShowBookingsView()
@@ -200,9 +291,23 @@ namespace Hotcakespicemanager
             label4.Visible = false;
             label6.Visible = false;
 
-            dataGridView1.Location = new Point(20, 120);
+            cmbStatus.Visible = true;
+            cmbType.Visible = true;
+            textBox4.Visible = true;
+            dtpDate.Visible = true;
+
+            dataGridView1.Location = new Point(20, 170);
             dataGridView1.Size = new Size(this.ClientSize.Width - 40, this.ClientSize.Height - 140);
             dataGridView1.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+
+            cmbStatus.Location = new Point(358, 145);
+            cmbStatus.Size = new Size(145,10);
+            cmbType.Location = new Point(192, 145);
+            cmbType.Size = new Size(145, 10);
+            textBox4.Location = new Point(1010, 145);
+            textBox4.Size = new Size(145, 10);
+            dtpDate.Location = new Point(518, 145);
+            dtpDate.Size = new Size(145, 10);
         }
 
         private async void button1_Click(object sender, EventArgs e)
@@ -240,8 +345,13 @@ namespace Hotcakespicemanager
             label5.Visible = true;
             label6.Visible = true;
 
-            dataGridView1.Location = new Point(205, 132);
-            dataGridView1.Size = new Size(698, 420);
+            cmbStatus.Visible = false;
+            cmbType.Visible = false;
+            textBox4.Visible = false;
+            dtpDate.Visible = false;
+
+            dataGridView1.Location = new Point(206, 132);
+            dataGridView1.Size = new Size(822, 550);
         }
         private async Task LoadProductsAsync()
         {

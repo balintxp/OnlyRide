@@ -53,6 +53,10 @@
             groupBox1 = new GroupBox();
             panel3 = new Panel();
             button4 = new Button();
+            dtpDate = new DateTimePicker();
+            cmbType = new ComboBox();
+            cmbStatus = new ComboBox();
+            textBox4 = new TextBox();
             ((System.ComponentModel.ISupportInitialize)trackBar1).BeginInit();
             ((System.ComponentModel.ISupportInitialize)dataGridView1).BeginInit();
             ((System.ComponentModel.ISupportInitialize)trackBar2).BeginInit();
@@ -255,6 +259,7 @@
             // 
             // panel2
             // 
+            panel2.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             panel2.BackColor = Color.LimeGreen;
             panel2.Location = new Point(0, 58);
             panel2.Name = "panel2";
@@ -302,13 +307,50 @@
             // 
             // button4
             // 
+            button4.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             button4.Location = new Point(882, 81);
             button4.Name = "button4";
             button4.Size = new Size(75, 23);
             button4.TabIndex = 25;
             button4.Text = "Foglalások";
             button4.UseVisualStyleBackColor = true;
-            button4.Click += this.button4_Click;
+            button4.Click += button4_Click;
+            // 
+            // dtpDate
+            // 
+            dtpDate.Format = DateTimePickerFormat.Short;
+            dtpDate.Location = new Point(460, 554);
+            dtpDate.Name = "dtpDate";
+            dtpDate.ShowCheckBox = true;
+            dtpDate.Size = new Size(127, 23);
+            dtpDate.TabIndex = 28;
+            dtpDate.Visible = false;
+            // 
+            // cmbType
+            // 
+            cmbType.FormattingEnabled = true;
+            cmbType.Location = new Point(313, 554);
+            cmbType.Name = "cmbType";
+            cmbType.Size = new Size(127, 23);
+            cmbType.TabIndex = 29;
+            cmbType.Visible = false;
+            // 
+            // cmbStatus
+            // 
+            cmbStatus.FormattingEnabled = true;
+            cmbStatus.Location = new Point(174, 554);
+            cmbStatus.Name = "cmbStatus";
+            cmbStatus.Size = new Size(127, 23);
+            cmbStatus.TabIndex = 30;
+            cmbStatus.Visible = false;
+            // 
+            // textBox4
+            // 
+            textBox4.Location = new Point(26, 555);
+            textBox4.Name = "textBox4";
+            textBox4.Size = new Size(127, 23);
+            textBox4.TabIndex = 30;
+            textBox4.Visible = false;
             // 
             // OnlyRideManagerForm
             // 
@@ -316,6 +358,10 @@
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = Color.White;
             ClientSize = new Size(1059, 585);
+            Controls.Add(textBox4);
+            Controls.Add(cmbType);
+            Controls.Add(cmbStatus);
+            Controls.Add(dtpDate);
             Controls.Add(button4);
             Controls.Add(panel3);
             Controls.Add(groupBox1);
@@ -376,5 +422,9 @@
         private Panel panel2;
         private Panel panel3;
         private Button button4;
+        private DateTimePicker dtpDate;
+        private ComboBox cmbType;
+        private ComboBox cmbStatus;
+        private TextBox textBox4;
     }
 }
