@@ -383,6 +383,7 @@
             Controls.Add(label3);
             Controls.Add(label2);
             FormBorderStyle = FormBorderStyle.FixedSingle;
+            Icon = (Icon)resources.GetObject("$this.Icon");
             Name = "OnlyRideManagerForm";
             StartPosition = FormStartPosition.CenterScreen;
             Text = "OnlyRide Admin Manager";
