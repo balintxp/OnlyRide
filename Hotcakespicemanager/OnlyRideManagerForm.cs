@@ -300,13 +300,14 @@ namespace Hotcakespicemanager
             dataGridView1.Size = new Size(this.ClientSize.Width - 40, this.ClientSize.Height - 140);
             dataGridView1.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
 
-            cmbStatus.Location = new Point(358, 145);
+            int dataWidth = this.ClientSize.Width - 40;
+            cmbStatus.Location = new Point(dataGridView1.Left + (int)(dataWidth/7*2) + 10, 140);
             cmbStatus.Size = new Size(145,10);
-            cmbType.Location = new Point(192, 145);
+            cmbType.Location = new Point(dataGridView1.Left + (int)(dataWidth / 7 * 1) + 10, 140);
             cmbType.Size = new Size(145, 10);
-            textBox4.Location = new Point(1010, 145);
+            textBox4.Location = new Point(dataGridView1.Left + (int)(dataWidth / 7 * 6) + 10, 140);
             textBox4.Size = new Size(145, 10);
-            dtpDate.Location = new Point(518, 145);
+            dtpDate.Location = new Point(dataGridView1.Left + (int)(dataWidth / 7 * 3) + 10, 140);
             dtpDate.Size = new Size(145, 10);
         }
 
@@ -326,6 +327,7 @@ namespace Hotcakespicemanager
             groupBox1.Visible = true;
 
             panel1.Visible = true;
+            panel3.Visible = true;
 
             trackBar1.Visible = true;
             trackBar2.Visible = true;
@@ -350,8 +352,14 @@ namespace Hotcakespicemanager
             textBox4.Visible = false;
             dtpDate.Visible = false;
 
-            dataGridView1.Location = new Point(206, 132);
-            dataGridView1.Size = new Size(822, 550);
+            int formWidth = this.ClientSize.Width;
+            int formHeight = this.ClientSize.Height;
+            dataGridView1.Top = panel3.Top;
+            dataGridView1.Left = panel3.Right + 10;
+            dataGridView1.Size = new Size(
+                (int)(formWidth * 0.65),
+                (int)(formHeight * 0.68)
+                );
         }
         private async Task LoadProductsAsync()
         {

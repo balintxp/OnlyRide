@@ -6,11 +6,11 @@
     <Nullable>enable</Nullable>
     <UseWindowsForms>true</UseWindowsForms>
     <ImplicitUsings>enable</ImplicitUsings>
-    <ApplicationIcon>OnlyRide_BigLogo_Transparent.ico</ApplicationIcon>
+    <ApplicationIcon>OnlyRideNew.ico</ApplicationIcon>
   </PropertyGroup>
 
   <ItemGroup>
-    <Content Include="OnlyRide_BigLogo_Transparent.ico" />
+    <Content Include="OnlyRideNew.ico" />
   </ItemGroup>
 
   <ItemGroup>

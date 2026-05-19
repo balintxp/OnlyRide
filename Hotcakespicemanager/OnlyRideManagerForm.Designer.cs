@@ -68,41 +68,44 @@
             // label2
             // 
             label2.AutoSize = true;
-            label2.Location = new Point(446, 81);
+            label2.Location = new Point(510, 108);
             label2.Name = "label2";
-            label2.Size = new Size(41, 15);
+            label2.Size = new Size(51, 20);
             label2.TabIndex = 1;
             label2.Text = "Min ár";
             // 
             // label3
             // 
             label3.AutoSize = true;
-            label3.Location = new Point(503, 81);
+            label3.Location = new Point(575, 108);
             label3.Name = "label3";
-            label3.Size = new Size(42, 15);
+            label3.Size = new Size(54, 20);
             label3.TabIndex = 2;
             label3.Text = "Max ár";
             // 
             // trackBar1
             // 
-            trackBar1.Location = new Point(560, 81);
+            trackBar1.Location = new Point(640, 108);
+            trackBar1.Margin = new Padding(3, 4, 3, 4);
             trackBar1.Name = "trackBar1";
-            trackBar1.Size = new Size(104, 45);
+            trackBar1.Size = new Size(119, 56);
             trackBar1.TabIndex = 3;
             trackBar1.Scroll += trackBar1_Scroll;
             // 
             // textBox1
             // 
-            textBox1.Location = new Point(446, 103);
+            textBox1.Location = new Point(501, 137);
+            textBox1.Margin = new Padding(3, 4, 3, 4);
             textBox1.Name = "textBox1";
-            textBox1.Size = new Size(51, 23);
+            textBox1.Size = new Size(67, 27);
             textBox1.TabIndex = 6;
             // 
             // textBox2
             // 
-            textBox2.Location = new Point(503, 103);
+            textBox2.Location = new Point(575, 137);
+            textBox2.Margin = new Padding(3, 4, 3, 4);
             textBox2.Name = "textBox2";
-            textBox2.Size = new Size(51, 23);
+            textBox2.Size = new Size(68, 27);
             textBox2.TabIndex = 7;
             // 
             // button1
@@ -110,9 +113,10 @@
             button1.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             button1.BackColor = SystemColors.Control;
             button1.FlatStyle = FlatStyle.System;
-            button1.Location = new Point(972, 81);
+            button1.Location = new Point(1100, 108);
+            button1.Margin = new Padding(3, 4, 3, 4);
             button1.Name = "button1";
-            button1.Size = new Size(75, 23);
+            button1.Size = new Size(97, 31);
             button1.TabIndex = 8;
             button1.Text = "Termékek";
             button1.UseVisualStyleBackColor = false;
@@ -123,9 +127,10 @@
             button2.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             button2.BackColor = SystemColors.Control;
             button2.FlatStyle = FlatStyle.System;
-            button2.Location = new Point(692, 81);
+            button2.Location = new Point(791, 108);
+            button2.Margin = new Padding(3, 4, 3, 4);
             button2.Name = "button2";
-            button2.Size = new Size(75, 23);
+            button2.Size = new Size(86, 31);
             button2.TabIndex = 9;
             button2.Text = "Szűrés";
             button2.UseVisualStyleBackColor = false;
@@ -143,21 +148,24 @@
             dataGridView1.BorderStyle = BorderStyle.None;
             dataGridView1.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             dataGridView1.GridColor = Color.LightGray;
-            dataGridView1.Location = new Point(206, 132);
+            dataGridView1.Location = new Point(235, 176);
+            dataGridView1.Margin = new Padding(3, 4, 3, 4);
             dataGridView1.Name = "dataGridView1";
             dataGridView1.ReadOnly = true;
             dataGridView1.RowHeadersVisible = false;
+            dataGridView1.RowHeadersWidth = 51;
             dataGridView1.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
-            dataGridView1.Size = new Size(697, 441);
+            dataGridView1.Size = new Size(797, 588);
             dataGridView1.TabIndex = 10;
             dataGridView1.CellContentClick += dataGridView1_CellContentClick;
             // 
             // button3
             // 
             button3.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
-            button3.Location = new Point(975, 550);
+            button3.Location = new Point(1114, 733);
+            button3.Margin = new Padding(3, 4, 3, 4);
             button3.Name = "button3";
-            button3.Size = new Size(75, 23);
+            button3.Size = new Size(86, 31);
             button3.TabIndex = 11;
             button3.Text = "Alkalmaz";
             button3.UseVisualStyleBackColor = true;
@@ -167,26 +175,28 @@
             // 
             comboBox2.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             comboBox2.FormattingEnabled = true;
-            comboBox2.Location = new Point(911, 165);
+            comboBox2.Location = new Point(1041, 220);
+            comboBox2.Margin = new Padding(3, 4, 3, 4);
             comboBox2.Name = "comboBox2";
-            comboBox2.Size = new Size(139, 23);
+            comboBox2.Size = new Size(158, 28);
             comboBox2.TabIndex = 12;
             // 
             // textBox3
             // 
             textBox3.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            textBox3.Location = new Point(911, 214);
+            textBox3.Location = new Point(1041, 285);
+            textBox3.Margin = new Padding(3, 4, 3, 4);
             textBox3.Name = "textBox3";
-            textBox3.Size = new Size(139, 23);
+            textBox3.Size = new Size(158, 27);
             textBox3.TabIndex = 14;
             // 
             // label4
             // 
             label4.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             label4.AutoSize = true;
-            label4.Location = new Point(959, 196);
+            label4.Location = new Point(1096, 261);
             label4.Name = "label4";
-            label4.Size = new Size(44, 15);
+            label4.Size = new Size(56, 20);
             label4.TabIndex = 15;
             label4.Text = "Összeg";
             // 
@@ -194,17 +204,18 @@
             // 
             label6.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             label6.AutoSize = true;
-            label6.Location = new Point(943, 147);
+            label6.Location = new Point(1078, 196);
             label6.Name = "label6";
-            label6.Size = new Size(60, 15);
+            label6.Size = new Size(74, 20);
             label6.TabIndex = 17;
             label6.Text = "%/normál";
             // 
             // trackBar2
             // 
-            trackBar2.Location = new Point(336, 81);
+            trackBar2.Location = new Point(384, 108);
+            trackBar2.Margin = new Padding(3, 4, 3, 4);
             trackBar2.Name = "trackBar2";
-            trackBar2.Size = new Size(104, 45);
+            trackBar2.Size = new Size(119, 56);
             trackBar2.TabIndex = 18;
             trackBar2.Scroll += trackBar2_Scroll;
             // 
@@ -216,10 +227,11 @@
             listBox1.Font = new Font("Segoe UI", 9.75F, FontStyle.Regular, GraphicsUnit.Point, 238);
             listBox1.ForeColor = Color.Black;
             listBox1.FormattingEnabled = true;
-            listBox1.ItemHeight = 17;
-            listBox1.Location = new Point(3, 19);
+            listBox1.ItemHeight = 21;
+            listBox1.Location = new Point(3, 24);
+            listBox1.Margin = new Padding(3, 4, 3, 4);
             listBox1.Name = "listBox1";
-            listBox1.Size = new Size(178, 404);
+            listBox1.Size = new Size(204, 540);
             listBox1.TabIndex = 19;
             listBox1.SelectedIndexChanged += listBox1_SelectedIndexChanged;
             // 
@@ -227,9 +239,10 @@
             // 
             checkBox1.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             checkBox1.AutoSize = true;
-            checkBox1.Location = new Point(909, 255);
+            checkBox1.Location = new Point(1038, 341);
+            checkBox1.Margin = new Padding(3, 4, 3, 4);
             checkBox1.Name = "checkBox1";
-            checkBox1.Size = new Size(114, 19);
+            checkBox1.Size = new Size(144, 24);
             checkBox1.TabIndex = 20;
             checkBox1.Text = "1000-re kerekítés";
             checkBox1.UseVisualStyleBackColor = true;
@@ -238,9 +251,10 @@
             // 
             checkBox2.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             checkBox2.AutoSize = true;
-            checkBox2.Location = new Point(909, 280);
+            checkBox2.Location = new Point(1038, 373);
+            checkBox2.Margin = new Padding(3, 4, 3, 4);
             checkBox2.Name = "checkBox2";
-            checkBox2.Size = new Size(138, 19);
+            checkBox2.Size = new Size(170, 24);
             checkBox2.TabIndex = 21;
             checkBox2.Text = "minden szűrt termék ";
             checkBox2.UseVisualStyleBackColor = true;
@@ -253,17 +267,19 @@
             panel1.Controls.Add(pictureBox1);
             panel1.Dock = DockStyle.Top;
             panel1.Location = new Point(0, 0);
+            panel1.Margin = new Padding(3, 4, 3, 4);
             panel1.Name = "panel1";
-            panel1.Size = new Size(1059, 65);
+            panel1.Size = new Size(1210, 87);
             panel1.TabIndex = 22;
             // 
             // panel2
             // 
             panel2.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             panel2.BackColor = Color.LimeGreen;
-            panel2.Location = new Point(0, 58);
+            panel2.Location = new Point(0, 77);
+            panel2.Margin = new Padding(3, 4, 3, 4);
             panel2.Name = "panel2";
-            panel2.Size = new Size(1059, 17);
+            panel2.Size = new Size(1210, 23);
             panel2.TabIndex = 24;
             // 
             // label5
@@ -271,18 +287,19 @@
             label5.AutoSize = true;
             label5.Font = new Font("Segoe UI Semibold", 26.25F, FontStyle.Bold, GraphicsUnit.Point, 238);
             label5.ForeColor = Color.White;
-            label5.Location = new Point(381, 0);
+            label5.Location = new Point(435, 0);
             label5.Name = "label5";
-            label5.Size = new Size(430, 47);
+            label5.Size = new Size(544, 60);
             label5.TabIndex = 1;
             label5.Text = "OnlyRide Admin Manager";
             // 
             // pictureBox1
             // 
             pictureBox1.Image = (Image)resources.GetObject("pictureBox1.Image");
-            pictureBox1.Location = new Point(-41, -16);
+            pictureBox1.Location = new Point(-47, -21);
+            pictureBox1.Margin = new Padding(3, 4, 3, 4);
             pictureBox1.Name = "pictureBox1";
-            pictureBox1.Size = new Size(252, 91);
+            pictureBox1.Size = new Size(288, 121);
             pictureBox1.SizeMode = PictureBoxSizeMode.Zoom;
             pictureBox1.TabIndex = 0;
             pictureBox1.TabStop = false;
@@ -290,9 +307,11 @@
             // groupBox1
             // 
             groupBox1.Controls.Add(listBox1);
-            groupBox1.Location = new Point(0, 123);
+            groupBox1.Location = new Point(0, 164);
+            groupBox1.Margin = new Padding(3, 4, 3, 4);
             groupBox1.Name = "groupBox1";
-            groupBox1.Size = new Size(184, 426);
+            groupBox1.Padding = new Padding(3, 4, 3, 4);
+            groupBox1.Size = new Size(210, 568);
             groupBox1.TabIndex = 23;
             groupBox1.TabStop = false;
             groupBox1.Text = "Kategóriák";
@@ -300,17 +319,19 @@
             // panel3
             // 
             panel3.BackColor = Color.FromArgb(35, 35, 35);
-            panel3.Location = new Point(190, 132);
+            panel3.Location = new Point(217, 176);
+            panel3.Margin = new Padding(3, 4, 3, 4);
             panel3.Name = "panel3";
-            panel3.Size = new Size(10, 416);
+            panel3.Size = new Size(11, 555);
             panel3.TabIndex = 24;
             // 
             // button4
             // 
             button4.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            button4.Location = new Point(882, 81);
+            button4.Location = new Point(998, 108);
+            button4.Margin = new Padding(3, 4, 3, 4);
             button4.Name = "button4";
-            button4.Size = new Size(75, 23);
+            button4.Size = new Size(96, 31);
             button4.TabIndex = 25;
             button4.Text = "Foglalások";
             button4.UseVisualStyleBackColor = true;
@@ -319,45 +340,49 @@
             // dtpDate
             // 
             dtpDate.Format = DateTimePickerFormat.Short;
-            dtpDate.Location = new Point(460, 554);
+            dtpDate.Location = new Point(526, 739);
+            dtpDate.Margin = new Padding(3, 4, 3, 4);
             dtpDate.Name = "dtpDate";
             dtpDate.ShowCheckBox = true;
-            dtpDate.Size = new Size(127, 23);
+            dtpDate.Size = new Size(145, 27);
             dtpDate.TabIndex = 28;
             dtpDate.Visible = false;
             // 
             // cmbType
             // 
             cmbType.FormattingEnabled = true;
-            cmbType.Location = new Point(313, 554);
+            cmbType.Location = new Point(358, 739);
+            cmbType.Margin = new Padding(3, 4, 3, 4);
             cmbType.Name = "cmbType";
-            cmbType.Size = new Size(127, 23);
+            cmbType.Size = new Size(145, 28);
             cmbType.TabIndex = 29;
             cmbType.Visible = false;
             // 
             // cmbStatus
             // 
             cmbStatus.FormattingEnabled = true;
-            cmbStatus.Location = new Point(174, 554);
+            cmbStatus.Location = new Point(199, 739);
+            cmbStatus.Margin = new Padding(3, 4, 3, 4);
             cmbStatus.Name = "cmbStatus";
-            cmbStatus.Size = new Size(127, 23);
+            cmbStatus.Size = new Size(145, 28);
             cmbStatus.TabIndex = 30;
             cmbStatus.Visible = false;
             // 
             // textBox4
             // 
-            textBox4.Location = new Point(26, 555);
+            textBox4.Location = new Point(30, 740);
+            textBox4.Margin = new Padding(3, 4, 3, 4);
             textBox4.Name = "textBox4";
-            textBox4.Size = new Size(127, 23);
+            textBox4.Size = new Size(145, 27);
             textBox4.TabIndex = 30;
             textBox4.Visible = false;
             // 
             // OnlyRideManagerForm
             // 
-            AutoScaleDimensions = new SizeF(7F, 15F);
+            AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = Color.White;
-            ClientSize = new Size(1059, 585);
+            ClientSize = new Size(1210, 780);
             Controls.Add(textBox4);
             Controls.Add(cmbType);
             Controls.Add(cmbStatus);
@@ -384,6 +409,7 @@
             Controls.Add(label2);
             FormBorderStyle = FormBorderStyle.FixedSingle;
             Icon = (Icon)resources.GetObject("$this.Icon");
+            Margin = new Padding(3, 4, 3, 4);
             Name = "OnlyRideManagerForm";
             StartPosition = FormStartPosition.CenterScreen;
             Text = "OnlyRide Admin Manager";
