@@ -1,3 +1,5 @@
 # OnlyRide
-# feature/HotcakesPriceManager
-# feature/servicebooking
+### feature/HotcakesPriceManager
+WinFormsApp kliens alkalmazás
+### feature/servicebooking
+DNN modul
