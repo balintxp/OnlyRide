@@ -1,6 +1,6 @@
 # OnlyRide
 
-Az **OnlyRide** egy egyetemi projekttárgy keretében (Rendszerfejlesztés és IT projektmenedzsment, 2026) készült rendszer, melynek célja egy autószerviz/műhely számára webshop és szervízidőpont-foglaló megoldás kialakítása, DotNetNuke (DNN) és HotCakes alapokon, Azure infrastruktúrán üzemeltetve.
+Az **OnlyRide** egy egyetemi projekttárgy keretében (Rendszerfejlesztés és IT projektmenedzsment, 2026) készült rendszer, melynek célja egy biciklibolt számára webshop és szervízidőpont-foglaló megoldás kialakítása, DotNetNuke (DNN) és HotCakes alapokon, Azure infrastruktúrán üzemeltetve.
 
 ## Technológiák
 
